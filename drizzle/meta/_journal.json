@@ -1,0 +1,69 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1770125384305,
+      "tag": "0000_yellow_hercules",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770125489383,
+      "tag": "0001_many_emma_frost",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770379405920,
+      "tag": "0002_glamorous_spencer_smythe",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770649653553,
+      "tag": "0003_nosy_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787750400000,
+      "tag": "0004_fulfilment_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789727622284,
+      "tag": "0005_order_item_customizations",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790000000000,
+      "tag": "0006_customer_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791264000000,
+      "tag": "0008_inventory_reservations",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791350400000,
+      "tag": "0009_product_variants",
+      "breakpoints": true
+    }
+  ]
+}
