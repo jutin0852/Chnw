@@ -78,13 +78,13 @@
 }
 
 :root {
-  /* CHNW brand tokens — placeholder denim palette. Change these to rebrand the whole store.
+  /* CHNW brand tokens — cherry red from the @chnw.ng logo (#A40009). Change these to rebrand the whole store.
      Keep src/config/brand.ts `colors` in sync (used by emails and invoices). */
-  --brand: #2f4a6d;
-  --brand-strong: #1f3350;
-  --brand-tint: #e8edf3;
-  --brand-line: #d7dee7;
-  --brand-canvas: #fbfbf9;
+  --brand: #a40009;
+  --brand-strong: #7a0007;
+  --brand-tint: #f7eceb;
+  --brand-line: #ead7d5;
+  --brand-canvas: #fbf9f7;
 
   --radius: 0.625rem;
 
@@ -222,4 +222,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Display serif for the wordmark and storefront headings (matches the serif in CHNW's Instagram graphics).
+   Unlayered so it wins over Tailwind tracking utilities; the admin keeps the sans font. */
+:where(h1):not([data-slot="sidebar-wrapper"] *),
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }

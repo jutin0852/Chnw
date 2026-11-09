@@ -42,7 +42,7 @@ export default function LoginPage() {
           <div className="mx-auto w-full max-w-md">
             <BrandLogo className="h-auto w-44" />
             <p className="mt-9 text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--brand)]">Staff area</p>
-            <h2 className="mt-3 text-4xl font-medium tracking-[-0.05em]">Sign in.</h2>
+            <h2 className="mt-3 font-display text-4xl font-medium tracking-[-0.05em]">Sign in.</h2>
             <p className="mt-3 text-sm leading-6 text-black/65">There is no public staff sign-up. Ask the owner for an invitation if you need access.</p>
 
             <form className="mt-9 space-y-5" onSubmit={handleSubmit}>

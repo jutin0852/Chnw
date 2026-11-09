@@ -222,7 +222,7 @@ export default function Storefront({ products }: { products: StoreProduct[] }) {
         <div className="mx-auto grid max-w-[1500px] gap-7 px-5 py-12 sm:px-8 sm:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16 lg:px-12">
           <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[var(--brand-strong)]">{BRAND.name}</p>
           <div className="max-w-2xl">
-            <h2 className="text-3xl font-medium leading-tight tracking-[-0.045em] sm:text-5xl">Slow fashion, reworked.</h2>
+            <h2 className="font-display text-3xl font-medium leading-tight tracking-[-0.045em] sm:text-5xl">Slow fashion, reworked.</h2>
             <p className="mt-5 max-w-xl text-sm leading-6 text-black/65 sm:text-base sm:leading-7">Small-batch pieces made from reworked denim, so every garment carries its own story. Fewer, better clothes, made to be worn for years.</p>
           </div>
         </div>

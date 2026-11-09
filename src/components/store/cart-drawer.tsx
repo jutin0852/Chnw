@@ -39,7 +39,7 @@ export default function CartDrawer({
         <div className="flex items-center justify-between border-b border-black pb-5">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--brand)]">CHNW</p>
-            <h2 className="mt-1 text-3xl font-medium tracking-[-0.04em]">Your bag</h2>
+            <h2 className="mt-1 font-display text-3xl font-medium tracking-[-0.04em]">Your bag</h2>
           </div>
           <button onClick={onClose} aria-label="Close shopping bag" className="grid size-10 place-items-center border border-black transition-colors hover:bg-black hover:text-white">
             <X size={22} strokeWidth={1.5} />

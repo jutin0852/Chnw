@@ -34,11 +34,11 @@ export const BRAND = {
 
   /** Hex colours for places CSS variables cannot reach (emails, PDFs, SVG icons). Keep in sync with globals.css. */
   colors: {
-    accent: "#2f4a6d",
-    accentStrong: "#1f3350",
-    tint: "#e8edf3",
+    accent: "#a40009",
+    accentStrong: "#7a0007",
+    tint: "#f7eceb",
     ink: "#141414",
-    canvas: "#fbfbf9",
+    canvas: "#fbf9f7",
   },
 } as const;
 

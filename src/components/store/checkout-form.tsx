@@ -107,7 +107,7 @@ export default function CheckoutForm({ initialCustomer }: { initialCustomer?: { 
 
         <aside className="bg-[var(--brand-tint)] px-5 py-10 sm:px-10 lg:py-16">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--brand)]">Order summary</p>
-          <h2 className="mt-3 text-3xl font-medium tracking-[-0.04em]">Your selected pieces</h2>
+          <h2 className="mt-3 font-display text-3xl font-medium tracking-[-0.04em]">Your selected pieces</h2>
           <div className="mt-7 divide-y divide-black/15 border-y border-black">
             {cart.map((item) => (
               <div key={JSON.stringify([item.id, item.size || "", item.customizations || {}])} className="flex gap-4 py-5">

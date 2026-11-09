@@ -1,10 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import { Bodoni_Moda } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "../components/store/cart-context";
 import { getSiteUrl } from "@/lib/site-url";
 import { GoogleAnalytics } from "../components/analytics/google-analytics";
 import { BRAND } from "@/config/brand";
+
+const displaySerif = Bodoni_Moda({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -56,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={displaySerif.variable} suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
         <Suspense fallback={null}>
           <GoogleAnalytics />
