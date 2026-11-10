@@ -277,7 +277,7 @@ html.lenis, html.lenis body { height: auto; }
 
 #loader {
   position: fixed; inset: 0; z-index: 100; overflow: hidden;
-  background: var(--ink); color: var(--paper);
+  background: var(--brand); color: var(--paper);
   animation: loader-failsafe 0s 7s forwards; /* never trap anyone if scripts fail */
 }
 html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader[hidden] { display: none; }
@@ -292,7 +292,7 @@ html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader
 .loader__word--late { animation-delay: 0.08s; }
 @keyframes loader-rise { from { transform: translateY(105%); } }
 .loader__window {
-  position: relative; display: block; overflow: hidden; background: #2a2622;
+  position: relative; display: block; overflow: hidden; background: #7a0007;
   width: clamp(64px, 9vw, 130px); aspect-ratio: 3 / 4.2; transform-origin: 50% 100%;
   animation: loader-open 0.9s 0.2s var(--ease-cloth, cubic-bezier(0.16, 1, 0.3, 1)) both;
 }
@@ -382,3 +382,6 @@ html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader
 .field-input::placeholder { color: rgb(94 87 79 / 0.7); }
 .field-input:focus { border-bottom-color: var(--brand); box-shadow: 0 1px 0 var(--brand); }
 .notice { border-left: 3px solid var(--brand); background: var(--mist); padding: 12px 16px; font-size: 14px; line-height: 1.6; }
+
+/* Bodoni Moda ships with an optical-size axis; keep its sturdier default cut at every size. */
+html { font-optical-sizing: none; }

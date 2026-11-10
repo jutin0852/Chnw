@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda, Courier_Prime, Instrument_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "../components/store/cart-context";
@@ -8,24 +8,27 @@ import { getSiteUrl } from "@/lib/site-url";
 import { GoogleAnalytics } from "../components/analytics/google-analytics";
 import { BRAND } from "@/config/brand";
 
+// Fonts are bundled in ./fonts (not fetched from Google at build time, so builds never depend on it).
 // Display: Bodoni Moda (the serif in CHNW's own graphics). Labels: Courier Prime (typewriter).
 // Reading text: Instrument Sans.
-const displaySerif = Bodoni_Moda({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+const displaySerif = localFont({
+  src: [
+    { path: "./fonts/bodoni-normal-400-600.woff2", weight: "400 600", style: "normal" },
+    { path: "./fonts/bodoni-italic-400-600.woff2", weight: "400 600", style: "italic" },
+  ],
   variable: "--font-bodoni",
   display: "swap",
 });
-const typewriter = Courier_Prime({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const typewriter = localFont({
+  src: [
+    { path: "./fonts/courier-normal-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/courier-normal-700.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-courier",
   display: "swap",
 });
-const sans = Instrument_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const sans = localFont({
+  src: [{ path: "./fonts/instrument-normal-400-600.woff2", weight: "400 600", style: "normal" }],
   variable: "--font-instrument",
   display: "swap",
 });
