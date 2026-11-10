@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { dash } from "@better-auth/infra";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { authDb } from "./auth-db";
 import { brandedEmail, escapeEmailHtml, sendEmail } from "./email";
@@ -14,10 +15,14 @@ const trustedOrigins = [
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
   `https://${BRAND.domain}`,
   `https://www.${BRAND.domain}`,
+  // Extra origins, comma separated (e.g. a phone testing against http://192.168.1.10:3000).
+  ...(process.env.EXTRA_TRUSTED_ORIGINS?.split(",") ?? []).map((origin) => origin.trim()),
 ].filter((origin): origin is string => Boolean(origin)).map((origin) => origin.replace(/\/$/, ""));
 
 export const auth = betterAuth({
   trustedOrigins,
+  // Better Auth dashboard (needs BETTER_AUTH_API_KEY): sign-in activity and user management.
+  plugins: [dash()],
   database: drizzleAdapter(authDb, { provider: "pg" }),
   rateLimit: {
     enabled: true,
