@@ -1,0 +1,27 @@
+// Page transitions: a quick paper fade, short enough that navigation never feels like waiting.
+import { gsap } from "gsap";
+import { prefersReducedMotion } from "./env";
+
+export type Transition = {
+  leave: (curtain: HTMLElement) => Promise<unknown> | gsap.core.Animation;
+  enter: (curtain: HTMLElement) => Promise<unknown> | gsap.core.Animation;
+};
+
+let current: Transition = {
+  leave: (c) => gsap.timeline().set(c, { autoAlpha: 0 }).to(c, { autoAlpha: 1, duration: 0.16, ease: "power1.out" }),
+  enter: (c) => gsap.to(c, { autoAlpha: 0, duration: 0.3, ease: "power1.out" }),
+};
+
+const reduced: Transition = {
+  leave: (c) => gsap.timeline().set(c, { autoAlpha: 1 }).fromTo(c, { opacity: 0 }, { opacity: 1, duration: 0.2 }),
+  enter: (c) => gsap.to(c, { autoAlpha: 0, duration: 0.2 }),
+};
+
+export const setTransition = (t: Transition) => {
+  current = t;
+};
+const pick = () => (prefersReducedMotion() ? reduced : current);
+const curtain = () => document.getElementById("curtain") as HTMLElement;
+
+export const playLeave = () => Promise.resolve(pick().leave(curtain()));
+export const playEnter = () => Promise.resolve(pick().enter(curtain()));

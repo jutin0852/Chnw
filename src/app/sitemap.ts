@@ -9,6 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getAllProducts();
   const pages: MetadataRoute.Sitemap = [
     { url: siteUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
+    { url: `${siteUrl}/shop`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteUrl}/shipping-delivery`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${siteUrl}/returns-exchanges`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${siteUrl}/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },

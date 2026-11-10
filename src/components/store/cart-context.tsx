@@ -39,6 +39,9 @@ type CartContextValue = {
   updateQuantity: (id: string, change: number, size?: string, customizations?: ProductCustomizations) => void;
   removeItem: (id: string, size?: string, customizations?: ProductCustomizations) => void;
   clearCart: () => void;
+  /** One bag drawer for the whole storefront, opened from the header, toasts and product pages. */
+  bagOpen: boolean;
+  setBagOpen: (open: boolean) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -48,6 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const cartRef = useRef<CartItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [bagOpen, setBagOpen] = useState(false);
 
   // Keep event handlers in sync even when several updates happen before a render.
   function saveCart(nextCart: CartItem[]) {
@@ -123,6 +127,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           window.localStorage.removeItem(storageKey);
           saveCart([]);
         },
+        bagOpen,
+        setBagOpen,
       }}
     >
       {children}

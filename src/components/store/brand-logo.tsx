@@ -25,7 +25,7 @@ export default function BrandLogo({
         x="153"
         y="57"
         textAnchor="middle"
-        style={{ fontFamily: 'var(--font-display), Georgia, "Times New Roman", serif' }}
+        style={{ fontFamily: 'var(--font-bodoni), Georgia, "Times New Roman", serif' }}
         fontWeight={600}
         fontSize="58"
         letterSpacing="8"

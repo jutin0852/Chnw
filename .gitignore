@@ -43,3 +43,8 @@ dev-start.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+instagram-archive/
+
+# awwwards QA screenshots
+.shots/
+.shots-log.txt

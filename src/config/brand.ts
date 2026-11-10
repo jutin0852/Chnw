@@ -36,9 +36,9 @@ export const BRAND = {
   colors: {
     accent: "#a40009",
     accentStrong: "#7a0007",
-    tint: "#f7eceb",
-    ink: "#141414",
-    canvas: "#fbf9f7",
+    tint: "#f3f1ee",
+    ink: "#141210",
+    canvas: "#ffffff",
   },
 } as const;
 

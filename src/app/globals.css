@@ -6,6 +6,17 @@
 
 
 @theme inline {
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-courier), ui-monospace, "Courier New", monospace;
+  --font-serif: var(--font-bodoni), Georgia, "Times New Roman", serif;
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-mist: var(--mist);
+  --color-stone: var(--stone);
+  --color-thread: var(--brand);
+  --color-thread-strong: var(--brand-strong);
+  --ease-cloth: cubic-bezier(0.16, 1, 0.3, 1);
+
   --radius-sm: calc(var(--radius) - 4px);
 
   --radius-md: calc(var(--radius) - 2px);
@@ -82,9 +93,16 @@
      Keep src/config/brand.ts `colors` in sync (used by emails and invoices). */
   --brand: #a40009;
   --brand-strong: #7a0007;
-  --brand-tint: #f7eceb;
-  --brand-line: #ead7d5;
-  --brand-canvas: #fbf9f7;
+  --brand-tint: #f3f1ee;
+  --brand-line: #e6e2dc;
+  --brand-canvas: #ffffff;
+
+  /* Storefront palette (The Workroom): thread red on white, ink for text and dark bands. */
+  --ink: #141210;
+  --paper: #ffffff;
+  --mist: #f3f1ee;
+  --stone: #5e574f;
+  --line: rgb(20 18 16 / 0.14);
 
   --radius: 0.625rem;
 
@@ -228,7 +246,139 @@
    Unlayered so it wins over Tailwind tracking utilities; the admin keeps the sans font. */
 :where(h1):not([data-slot="sidebar-wrapper"] *),
 .font-display {
-  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-family: var(--font-bodoni), Georgia, "Times New Roman", serif;
   font-weight: 500;
   letter-spacing: -0.01em;
 }
+
+/* ───────────── Storefront: engine foundation ───────────── */
+
+.skip-link {
+  position: fixed; left: 16px; top: 16px; z-index: 120;
+  padding: 0.6em 1em; background: var(--ink); color: var(--paper);
+  font-family: var(--font-courier), monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible { transform: none; }
+
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* Hidden-until-revealed, only when JS runs and motion is allowed (set before first paint). */
+.motion [data-split], .motion [data-reveal] { visibility: hidden; }
+.split-line { padding-bottom: 0.1em; margin-bottom: -0.1em; }
+
+/* Page curtain: a quick paper fade between storefront pages. GSAP owns its opacity. */
+#curtain { position: fixed; inset: 0; z-index: 90; pointer-events: none; visibility: hidden; opacity: 0; }
+.curtain__panel { position: absolute; inset: 0; background: var(--paper, #fff); }
+
+/* ───────────── Loader (home, first visit per session) ───────────── */
+
+#loader {
+  position: fixed; inset: 0; z-index: 100; overflow: hidden;
+  background: var(--ink); color: var(--paper);
+  animation: loader-failsafe 0s 7s forwards; /* never trap anyone if scripts fail */
+}
+html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader[hidden] { display: none; }
+@keyframes loader-failsafe { to { visibility: hidden; } }
+.loader__stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 28px); }
+.loader__mask { display: block; overflow: hidden; }
+.loader__word {
+  display: block; font-family: var(--font-bodoni), serif; font-weight: 600;
+  font-size: clamp(96px, 18vw, 260px); line-height: 1; letter-spacing: 0.04em;
+  animation: loader-rise 1s var(--ease-cloth, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+.loader__word--late { animation-delay: 0.08s; }
+@keyframes loader-rise { from { transform: translateY(105%); } }
+.loader__window {
+  position: relative; display: block; overflow: hidden; background: #2a2622;
+  width: clamp(64px, 9vw, 130px); aspect-ratio: 3 / 4.2; transform-origin: 50% 100%;
+  animation: loader-open 0.9s 0.2s var(--ease-cloth, cubic-bezier(0.16, 1, 0.3, 1)) both;
+}
+@keyframes loader-open { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+.loader__window img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: loader-flick 1.6s steps(1) infinite; }
+@keyframes loader-flick { 0% { opacity: 1; } 12.5%, 100% { opacity: 0; } }
+.loader__count {
+  position: absolute; top: calc(50% - clamp(72px, 12vw, 170px)); right: clamp(16px, 12vw, 220px);
+  font-family: var(--font-courier), monospace; font-size: 16px; font-variant-numeric: tabular-nums;
+}
+.loader__meta { position: absolute; bottom: 24px; font-family: var(--font-courier), monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; }
+
+/* ───────────── Storefront components ───────────── */
+
+/* Mono labels: Courier Prime, after Deadly Ponies' typewriter discipline. */
+.label { font-family: var(--font-courier), ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* Underline that draws in from the left on hover (nav and text links). */
+.draw {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px; background-repeat: no-repeat; background-position: 100% 100%;
+  transition: background-size 0.6s var(--ease-cloth, ease);
+  padding-bottom: 2px;
+}
+.draw:hover, .draw:focus-visible, .draw[aria-current="page"] { background-size: 100% 1px; background-position: 0% 100%; }
+
+/* Pill button: ink flood rises from below on hover. */
+.pill {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.6em;
+  border-radius: 999px; padding: 16px 28px; font-size: 15px; font-weight: 500; line-height: 1.2;
+  transition: color 0.5s var(--ease-cloth, ease), transform 0.2s ease;
+}
+.pill::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: var(--pill-flood, var(--ink)); transform: translateY(101%);
+  transition: transform 0.6s var(--ease-cloth, ease);
+}
+.pill:hover::before, .pill:focus-visible::before { transform: translateY(0); }
+.pill:active { transform: scale(0.98); }
+.pill--red { background: var(--brand); color: #fff; }
+.pill--ink { background: var(--ink); color: var(--paper); --pill-flood: var(--brand); }
+.pill--line { border: 1px solid currentColor; }
+.pill--line:hover { color: var(--paper); }
+.pill--light { border: 1px solid rgb(255 255 255 / 0.7); color: #fff; --pill-flood: #fff; }
+.pill--light:hover { color: var(--ink); }
+.pill:disabled { opacity: 0.4; cursor: not-allowed; }
+.pill:disabled::before { display: none; }
+
+/* Product card: photo settles from a slight zoom, second photo crossfades in on hover. */
+.card-media { position: relative; overflow: hidden; background: var(--mist); }
+.card-media img { transition: transform 1.2s var(--ease-cloth, ease), opacity 0.6s ease; }
+.card:hover .card-media img:first-child { transform: scale(1.04); }
+.card-media .card-alt { opacity: 0; }
+.card:hover .card-media .card-alt { opacity: 1; transform: scale(1.04); }
+
+/* Category index: a red thread draws across the row, the name shifts right. */
+.index-row { position: relative; }
+.index-row::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 0; border-top: 2px dashed var(--brand);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.8s var(--ease-cloth, ease);
+}
+.index-row:hover::after, .index-row:focus-visible::after { transform: scaleX(1); }
+.index-row .index-name { transition: transform 0.7s var(--ease-cloth, ease), color 0.4s ease; }
+.index-row:hover .index-name, .index-row:focus-visible .index-name { transform: translateX(18px); color: var(--brand); }
+.index-row .index-thumb { clip-path: inset(100% 0 0 0); transition: clip-path 0.7s var(--ease-cloth, ease); }
+.index-row:hover .index-thumb, .index-row:focus-visible .index-thumb { clip-path: inset(0 0 0 0); }
+
+.stitch { border-top: 2px dashed var(--brand); }
+
+/* Client-rendered lists (shop grid): rise on mount, since scroll reveals only wire server markup. */
+.motion .rise { animation: rise 0.9s var(--ease-cloth, cubic-bezier(0.16, 1, 0.3, 1)) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(28px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .loader__word, .loader__window, .loader__window img { animation: none !important; }
+  .loader__window img:first-child { opacity: 1; }
+  .pill::before, .draw, .card-media img, .index-row::after, .index-row .index-name, .index-row .index-thumb { transition: none !important; }
+}
+
+/* ───────────── Forms (sign in, register, recovery) ───────────── */
+.field-label { display: block; margin-bottom: 6px; font-family: var(--font-courier), ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.field-input {
+  width: 100%; padding: 10px 0; background: transparent; font-size: 16px; outline: none; border-radius: 0;
+  border: 0; border-bottom: 1px solid var(--ink); transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.field-input::placeholder { color: rgb(94 87 79 / 0.7); }
+.field-input:focus { border-bottom-color: var(--brand); box-shadow: 0 1px 0 var(--brand); }
+.notice { border-left: 3px solid var(--brand); background: var(--mist); padding: 12px 16px; font-size: 14px; line-height: 1.6; }

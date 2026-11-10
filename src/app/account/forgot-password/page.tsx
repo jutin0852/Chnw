@@ -1,5 +1,16 @@
 "use client";
 import Link from "next/link";
+import AuthShell from "@/components/store/auth-shell";
 import { useState } from "react";
 import { requestPasswordReset } from "@/lib/auth-client";
-export default function ForgotPasswordPage() { const [email, setEmail] = useState(""); const [message, setMessage] = useState(""); const [pending, setPending] = useState(false); async function submit(event: React.FormEvent) { event.preventDefault(); setPending(true); const result = await requestPasswordReset({ email, redirectTo: `${window.location.origin}/account/reset-password` }); setPending(false); setMessage(result.error ? result.error.message || "We could not send that reset email." : "If an account exists for this email, a reset link is on its way."); } return <main className="mx-auto min-h-screen max-w-xl px-5 py-20"><Link href="/account/sign-in" className="text-xs font-semibold uppercase tracking-[.14em] text-[var(--brand)] underline">Back to sign in</Link><p className="mt-12 text-xs font-semibold uppercase tracking-[.16em] text-[var(--brand)]">Account recovery</p><h1 className="mt-4 text-5xl font-medium tracking-[-.06em]">Reset your password.</h1><form onSubmit={submit} className="mt-9 space-y-5"><label className="block text-sm">Email address<input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2 w-full border border-black px-4 py-3" /></label>{message && <p className="border-l-4 border-[var(--brand)] bg-[var(--brand-tint)] px-4 py-3 text-sm">{message}</p>}<button disabled={pending} className="bg-black px-6 py-4 text-xs font-semibold uppercase tracking-[.14em] text-white">{pending ? "Sending..." : "Send reset link"}</button></form></main>; }
+export default function ForgotPasswordPage() { const [email, setEmail] = useState(""); const [message, setMessage] = useState(""); const [pending, setPending] = useState(false); async function submit(event: React.FormEvent) { event.preventDefault(); setPending(true); const result = await requestPasswordReset({ email, redirectTo: `${window.location.origin}/account/reset-password` }); setPending(false); setMessage(result.error ? result.error.message || "We could not send that reset email." : "If an account exists for this email, a reset link is on its way."); } return (
+    <AuthShell tone="mist" panelLabel="Account recovery" panelTitle="Locked out? It happens." panelBody="Enter the email you signed up with and we will send you a link to choose a new password." label="Account recovery" heading="Reset your password.">
+      <form onSubmit={submit} className="mt-9 space-y-6">
+        <label className="block"><span className="field-label">Email address</span><input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="field-input" autoComplete="email" /></label>
+        {message && <p role="status" className="notice">{message}</p>}
+        <button disabled={pending} className="pill pill--ink w-full disabled:opacity-50">{pending ? "Sending..." : "Send reset link"}</button>
+      </form>
+      <Link href="/account/sign-in" className="label draw mt-6 inline-block py-1 text-[12px] text-thread">Back to sign in</Link>
+    </AuthShell>
+  );
+}

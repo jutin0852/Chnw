@@ -1,18 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import { Bodoni_Moda } from "next/font/google";
+import { Bodoni_Moda, Courier_Prime, Instrument_Sans } from "next/font/google";
 import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "../components/store/cart-context";
+import StoreMotion from "../components/store/store-motion";
 import { getSiteUrl } from "@/lib/site-url";
 import { GoogleAnalytics } from "../components/analytics/google-analytics";
 import { BRAND } from "@/config/brand";
 
+// Display: Bodoni Moda (the serif in CHNW's own graphics). Labels: Courier Prime (typewriter).
+// Reading text: Instrument Sans.
 const displaySerif = Bodoni_Moda({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-display",
+  style: ["normal", "italic"],
+  variable: "--font-bodoni",
   display: "swap",
 });
+const typewriter = Courier_Prime({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-courier",
+  display: "swap",
+});
+const sans = Instrument_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-instrument",
+  display: "swap",
+});
+
+// Before first paint: .js and .motion gate the hidden-until-revealed styles; .loader-seen skips
+// the home loader after the first visit in a session.
+const flags = `(function(){var d=document.documentElement;d.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('motion');try{if(sessionStorage.getItem('chnw-loader-seen'))d.classList.add('loader-seen')}catch(e){}})()`;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -64,8 +84,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={displaySerif.variable} suppressHydrationWarning>
+    <html lang="en" className={`${displaySerif.variable} ${typewriter.variable} ${sans.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: flags }} />
+      </head>
       <body className="antialiased" suppressHydrationWarning>
+        <a className="skip-link" href="#main">Skip to content</a>
+        <div id="curtain" aria-hidden="true">
+          <div className="curtain__panel" />
+        </div>
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
@@ -80,6 +107,7 @@ export default function RootLayout({
           sameAs: [BRAND.social.instagram, BRAND.social.facebook, BRAND.social.tiktok].filter(Boolean),
         }) }} />
         <CartProvider>{children}</CartProvider>
+        <StoreMotion />
       </body>
     </html>
   );

@@ -95,6 +95,34 @@ The unit isn't printed on the chart. These numbers match inches.
 - Clean layouts, generous space, one accent colour
 - Honest, specific copy about how pieces are made — no unverified sustainability claims
 
+## Reference sites (collected 2026-11-10, not implemented yet)
+
+**Balmoral — https://www.balmoralrunning.com/ — hero video**
+- Full-screen video (100vh, `object-fit: cover`), autoplay, muted, loop, no controls. It's a 1080p MP4 served from the Shopify CDN.
+- Footage is slow and moody with a lone figure and real locations, colour-graded down. It reads as film rather than an ad.
+- A big centred white serif wordmark sits over the video, with a small version of the same wordmark in the nav.
+- Bottom edge: a serif "New Arrivals" label and a small "Shop" link on the left, and a short paragraph about the season on the right.
+- For CHNW: use one of the reels (a workroom, sewing or styling clip) as the home hero, with the serif CHNW wordmark over it and the season note at the bottom.
+
+**Outfit by ++hellohello — https://outfit.hellohello.is/ — loader and motion**
+- Loader on a black screen: the OUTFIT wordmark, a small rapid slideshow of product photos flickering inside the gap between letters, and a counter ("083") counting to 100.
+- Then the letters collapse into bars and the screen wipes up to the light page.
+- After loading, a huge full-width wordmark in the accent colour sits above a thin rule, an info row in small text and the product grid.
+- The grid is uneven: cards of different sizes are scattered with lots of empty space, and each card has its name, price and a small coloured dot tag.
+- Built on Next.js (our stack) with Lenis smooth scroll.
+- For CHNW: the CHNW wordmark with Instagram photos flickering through it, a 0–100 counter in mono, then a red wipe revealing the home page.
+  - Show it once per session.
+  - Respect `prefers-reduced-motion`.
+
+**Deadly Ponies — https://deadlyponies.com/ — typography**
+- The site runs almost entirely on one custom typewriter-style monospace with slab serifs (`DLYP-SansText`, their own font), mostly in uppercase.
+- It is used small and widely spaced for the nav, labels and links, with the wordmark in the same voice.
+- That one-font, typewriter discipline is what makes it stand apart.
+- The font is proprietary, so we can't use it.
+  - Free options closest in feel: Courier Prime, Cutive Mono, Xanh Mono.
+  - Paid options: Klim's Pitch, GT Alpina Typewriter.
+- For CHNW: this could replace or sit beside IBM Plex Mono for the work-tag, label and nav layer, next to the Bodoni wordmark.
+
 ## Avoid
 
 - Generic stock photography
@@ -105,3 +133,28 @@ The unit isn't printed on the chart. These numbers match inches.
 
 - 2026-11-09: Codebase set up from the shared store template. Placeholder denim palette and text logo until CHNW's assets arrive.
 - 2026-11-09: Rebranded from Instagram research. Accent is CHNW red #A40009 (strong #7A0007, tint #F7ECEB). Bodoni Moda (Google Fonts) is the display serif for the wordmark and storefront headings; body text and the admin stay sans. Favicons and share image are a red disc / red card with the white serif wordmark. Swap in the real logo file when CHNW sends it.
+
+## Store redesign: The Workroom (implemented 2026-11-10)
+
+```
+Idea:        The store feels like walking into CHNW's studio: real fabric, real hands, made after you order.
+Metaphor:    A sewing workroom. Thread red, work tags, tacking stitches, typewritten labels.
+Signature:   First-visit loader. CHNW's photos flicker through a window in the wordmark, a counter follows
+             real loading, a thread-red panel wipes up and lifts off the hero films already playing.
+Emotion:     Calm, crafted, confident. A studio, not a sale.
+Motion verb: Settle like cloth. Long expo outs, nothing bouncy; red wipes between pages.
+Screenshot:  Three reels side by side with the white Bodoni CHNW across them.
+```
+
+### System
+- Palette: paper #FFFFFF (ground), ink #141210 (text, dark bands), thread red #A40009 (accent, CTAs, wipes), mist #F3F1EE (banded sections), stone #5E574F (muted text).
+- Type: Bodoni Moda (display, wordmark), Instrument Sans (reading), Courier Prime (labels, prices, nav, after Deadly Ponies). All via next/font/google.
+- Shape: pills for actions, square everything else. Dashed red "stitch" rule as the divider and checkout progress.
+- Motion: GSAP + Lenis on one clock (`src/engine`), SplitText headline reveals, clip reveals on media, red curtain between storefront pages (`src/engine/transition.ts`). Admin, checkout and account keep native scroll and plain navigation. Everything switches off under reduced motion; hero films start paused and every film can be paused.
+- Films: Instagram reels on Cloudinary (`chnw/video/<post code>`), mapped in `src/config/films.ts`. Reels play only while on screen.
+
+### Decisions
+- 2026-11-10: Reels are 720×1280, so the desktop hero shows three side by side at native sharpness instead of stretching one (after Balmoral's full-screen film, adapted). Phones show the middle reel alone.
+- 2026-11-10: Page background is pure white (owner's choice over linen).
+- 2026-11-10: Product size picker uses CHNW's UK 4 to 20 chart (replaces the template's S/M/L/XL table). No size is preselected.
+- 2026-11-10: New `/shop` page holds the filterable grid; home is editorial. Header links use `?category=`.
