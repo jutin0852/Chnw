@@ -178,7 +178,7 @@ export default function ShopGrid({
                     <li key="feature" className="rise col-span-2 lg:order-none lg:col-span-4">
                       <Link href={`/product/${feature.product.slug}`} className="card group relative grid overflow-hidden bg-ink text-white md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                         <span className="relative block aspect-[9/16] max-h-[640px] w-full overflow-hidden md:aspect-auto md:h-[560px]">
-                          <ReelVideo code={feature.code} label={feature.alt} />
+                          <ReelVideo code={feature.code} label={feature.alt} width={720} />
                         </span>
                         <span className="flex flex-col justify-end gap-5 p-6 sm:p-10">
                           <span className="label text-[12px] text-white/70">Film · plays as you scroll</span>

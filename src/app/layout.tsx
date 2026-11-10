@@ -13,8 +13,12 @@ import { BRAND } from "@/config/brand";
 // Reading text: Instrument Sans.
 const displaySerif = localFont({
   src: [
-    { path: "./fonts/bodoni-normal-400-600.woff2", weight: "400 600", style: "normal" },
-    { path: "./fonts/bodoni-italic-400-600.woff2", weight: "400 600", style: "italic" },
+    { path: "./fonts/bodoni-normal-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/bodoni-normal-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/bodoni-normal-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/bodoni-italic-400.woff2", weight: "400", style: "italic" },
+    { path: "./fonts/bodoni-italic-500.woff2", weight: "500", style: "italic" },
+    { path: "./fonts/bodoni-italic-600.woff2", weight: "600", style: "italic" },
   ],
   variable: "--font-bodoni",
   display: "swap",
@@ -40,6 +44,8 @@ const flags = `(function(){var d=document.documentElement;d.classList.add('js');
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  // Edge-to-edge on notched phones; headers pad themselves with env(safe-area-inset-top).
+  viewportFit: "cover",
   themeColor: "#ffffff",
 };
 

@@ -261,7 +261,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
       </section>
 
       {!isCustomWear && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)] bg-paper/95 px-3 pb-4 pt-3 backdrop-blur-sm lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)] bg-paper/95 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm lg:hidden">
           <div className="mx-auto flex max-w-lg items-center gap-3">
             {whatsappHref && (
               <a href={whatsappHref} target="_blank" rel="noreferrer" aria-label="Ask about it on WhatsApp" className="label grid h-[52px] shrink-0 place-items-center rounded-full border border-ink px-4 text-[11px]">Ask</a>

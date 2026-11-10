@@ -4,14 +4,20 @@
  */
 const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "nwrotdpo";
 
-/** MP4 (H.264, no audio) sized for the slot. Cloudinary transcodes once, then serves from its CDN. */
+/**
+ * MP4 (H.264, no audio) sized for the slot, with a capped bitrate: about half the size of the plain
+ * q_auto version at 720px, two thirds smaller at 540px. Cloudinary transcodes once, then serves from its CDN.
+ */
 export function filmSrc(code: string, width = 720) {
-  return `https://res.cloudinary.com/${cloud}/video/upload/q_auto,vc_h264,ac_none,w_${width},c_limit/chnw/video/${code}.mp4`;
+  return `https://res.cloudinary.com/${cloud}/video/upload/br_${width <= 540 ? 900 : 1400}k,vc_h264,ac_none,w_${width},c_limit/${publicId(code)}.mp4`;
 }
+
+/** A film is either an Instagram post code (older films) or a full Cloudinary public id (uploaded in the admin). */
+const publicId = (code: string) => (code.includes("/") ? code : `chnw/video/${code}`);
 
 /** A still from the film, used as the poster so something shows before the video plays. */
 export function filmPoster(code: string, width = 720, second = 0.5) {
-  return `https://res.cloudinary.com/${cloud}/video/upload/so_${second},q_auto,f_jpg,w_${width},c_limit/chnw/video/${code}.jpg`;
+  return `https://res.cloudinary.com/${cloud}/video/upload/so_${second},q_auto,f_jpg,w_${width},c_limit/${publicId(code)}.jpg`;
 }
 
 export type Film = { code: string; alt: string };

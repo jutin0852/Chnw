@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { startScroll, stopScroll } from "@/engine";
@@ -72,8 +73,8 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
         ref={headerRef}
         className={
           overlay
-            ? "absolute inset-x-0 top-0 z-30 text-white"
-            : "sticky top-0 z-30 border-b border-[var(--line)] bg-paper/95 text-ink backdrop-blur-sm"
+            ? "absolute inset-x-0 top-0 z-30 pt-[env(safe-area-inset-top)] text-white"
+            : "sticky top-0 z-30 border-b border-[var(--line)] bg-paper/95 pt-[env(safe-area-inset-top)] text-ink backdrop-blur-sm"
         }
       >
         {overlay && (
@@ -124,9 +125,16 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
             CHNW
           </Link>
 
-          <div className="flex items-center justify-end gap-x-6">
+          <div className="flex items-center justify-end gap-x-1 lg:gap-x-5">
             <Link href="/shop#search" className="label draw hidden py-1 text-[13px] lg:inline">Search</Link>
-            <Link href="/account" className="label draw hidden py-1 text-[13px] lg:inline">Account</Link>
+            <Link
+              href="/account"
+              aria-label="Account"
+              title="Account"
+              className="grid h-11 w-11 place-items-center transition-[transform,color] duration-300 ease-cloth hover:-translate-y-0.5 hover:text-thread lg:h-7 lg:w-7"
+            >
+              <User size={20} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
             <button
               type="button"
               onClick={() => setBagOpen(true)}
@@ -192,7 +200,7 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
         data-lenis-prevent
         className={`fixed inset-0 z-[60] flex flex-col bg-ink text-paper transition-[clip-path] duration-700 ease-cloth lg:hidden ${menuOpen ? "[clip-path:inset(0_0_0_0)]" : "[clip-path:inset(0_0_100%_0)]"}`}
       >
-        <div className="flex items-center justify-between px-2 py-2">
+        <div className="flex items-center justify-between px-2 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
           <span className="label px-2 text-[12px] text-white/60">Menu</span>
           <button type="button" onClick={() => setMenuOpen(false)} className="label grid h-11 min-w-11 place-items-center px-2 text-[12px]">
             Close

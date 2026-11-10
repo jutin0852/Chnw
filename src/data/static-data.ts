@@ -8,6 +8,7 @@ import {
   IconPackages,
   IconMessageStar,
   IconReceipt,
+  IconMovie,
 } from "@tabler/icons-react";
 
 export const adminNav = {
@@ -53,6 +54,11 @@ export const adminNav = {
       name: "Media library",
       url: "/admin/product-media",
       icon: IconPhoto,
+    },
+    {
+      name: "Films",
+      url: "/admin/films",
+      icon: IconMovie,
     },
     {
       name: "All products",

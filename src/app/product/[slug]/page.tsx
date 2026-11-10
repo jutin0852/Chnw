@@ -8,7 +8,7 @@ import SiteHeader from "../../../components/store/site-header";
 import SiteFooter from "../../../components/store/site-footer";
 import { pieceNumbers } from "../../../components/store/catalog";
 import { getAllProducts, getProductBySlug } from "../../../lib/store-queries";
-import { productFilm } from "@/config/films";
+import { getProductFilms } from "@/lib/films-queries";
 import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +46,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [product, all] = await Promise.all([getProductBySlug(slug), getAllProducts()]);
+  const [product, all, productFilm] = await Promise.all([getProductBySlug(slug), getAllProducts(), getProductFilms()]);
 
   if (!product) {
     notFound();

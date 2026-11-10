@@ -149,6 +149,18 @@ export const productImages = pgTable("product_images", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Films shown on the storefront: three home hero reels (placement "hero", position 0-2) and one
+// reel per product page (placement "product"). video_id is the Cloudinary public id.
+export const siteFilms = pgTable("site_films", {
+  id: text("id").primaryKey().$defaultFn(() => createId()),
+  placement: text("placement").notNull(),
+  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }),
+  position: integer("position").notNull().default(0),
+  videoId: text("video_id").notNull(),
+  alt: text("alt"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Orders table
 export const orders = pgTable("orders", {
   id: text("id")

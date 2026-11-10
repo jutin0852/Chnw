@@ -5,7 +5,7 @@ import SiteHeader from "@/components/store/site-header";
 import SiteFooter from "@/components/store/site-footer";
 import ShopGrid from "@/components/store/shop-grid";
 import { pieceNumbers } from "@/components/store/catalog";
-import { productFilm } from "@/config/films";
+import { getProductFilms } from "@/lib/films-queries";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
-  const [{ category }, products] = await Promise.all([searchParams, getAllProducts()]);
+  const [{ category }, products, productFilm] = await Promise.all([searchParams, getAllProducts(), getProductFilms()]);
   const numbers = Object.fromEntries(pieceNumbers(products));
   const known = new Set(products.map((p) => p.category?.slug));
   const featured = products.find((p) => p.slug === "the-gigi-pants");

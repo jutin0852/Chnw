@@ -17,7 +17,7 @@ export default function HeroFilms({ films }: { films: Film[] }) {
     const wide = matchMedia("(min-width: 768px)").matches;
     refs.current.forEach((video, i) => {
       if (!video) return;
-      if (i !== 1 && wide && !video.src) video.src = filmSrc(films[i].code);
+      if (i !== 1 && wide && !video.src) video.src = filmSrc(films[i].code, 540);
     });
     if (prefersReducedMotion()) {
       refs.current.forEach((v) => v?.pause());
@@ -45,7 +45,7 @@ export default function HeroFilms({ films }: { films: Film[] }) {
                 refs.current[i] = el;
               }}
               src={i === 1 ? filmSrc(film.code) : undefined}
-              poster={filmPoster(film.code)}
+              poster={filmPoster(film.code, i === 1 ? 720 : 540)}
               autoPlay
               muted
               loop

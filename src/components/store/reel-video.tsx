@@ -10,7 +10,7 @@ import { usePage } from "@/engine/next";
  * A muted reel that plays only while it is on screen (saves data and battery). Under reduced
  * motion it stays on its poster with native controls, so nothing moves unless asked.
  */
-export default function ReelVideo({ code, label, className = "" }: { code: string; label: string; className?: string }) {
+export default function ReelVideo({ code, label, className = "", width = 540 }: { code: string; label: string; className?: string; width?: number }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   usePage(() => {
@@ -26,7 +26,7 @@ export default function ReelVideo({ code, label, className = "" }: { code: strin
       end: "bottom top",
       onToggle: (self) => {
         if (self.isActive) {
-          if (!video.src) video.src = filmSrc(code);
+          if (!video.src) video.src = filmSrc(code, width);
           video.play().catch(() => {});
         } else video.pause();
       },
@@ -36,7 +36,7 @@ export default function ReelVideo({ code, label, className = "" }: { code: strin
   return (
     <video
       ref={ref}
-      poster={filmPoster(code)}
+      poster={filmPoster(code, width)}
       muted
       loop
       playsInline

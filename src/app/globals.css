@@ -383,5 +383,3 @@ html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader
 .field-input:focus { border-bottom-color: var(--brand); box-shadow: 0 1px 0 var(--brand); }
 .notice { border-left: 3px solid var(--brand); background: var(--mist); padding: 12px 16px; font-size: 14px; line-height: 1.6; }
 
-/* Bodoni Moda ships with an optical-size axis; keep its sturdier default cut at every size. */
-html { font-optical-sizing: none; }

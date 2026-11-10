@@ -10,14 +10,15 @@ import ReelVideo from "../components/store/reel-video";
 import ProductCard from "../components/store/product-card";
 import { cloudinaryThumb, pieceNumbers, shortName } from "../components/store/catalog";
 import { formatStorePrice } from "../components/store/currency";
-import { fabricFilm, heroFilms, lookFilms } from "@/config/films";
+import { fabricFilm, lookFilms } from "@/config/films";
+import { getHeroFilms } from "@/lib/films-queries";
 
 export const dynamic = "force-dynamic";
 
 const NEW_IN = ["the-triangle-tote", "the-crochet-denim-skirt", "the-gigi-pants-polka-dot", "the-soni-dress", "the-asymmetric-denim-skirt"];
 
 export default async function Home() {
-  const everything = await getAllProducts();
+  const [everything, heroFilms] = await Promise.all([getAllProducts(), getHeroFilms()]);
   const numbers = pieceNumbers(everything);
   const bySlug = new Map(everything.map((p) => [p.slug, p]));
   const products = collapseColourways(everything);
