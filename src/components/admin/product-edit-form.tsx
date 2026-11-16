@@ -29,6 +29,7 @@ export function ProductEditForm({
   const [materials, setMaterials] = useState(product.materials || "");
   const [care, setCare] = useState(product.careInstructions || "");
   const [isActive, setIsActive] = useState(product.isActive ?? true);
+  const [unlimitedStock, setUnlimitedStock] = useState(product.unlimitedStock);
   const [variants, setVariants] = useState(product.variants.map((variant) => ({ id: variant.id, size: variant.size, sku: variant.sku, inventoryCount: variant.inventoryCount, isActive: variant.isActive })));
   const [newSize, setNewSize] = useState("");
   const [featured, setFeatured] = useState(product.featured ?? false);
@@ -58,6 +59,7 @@ export function ProductEditForm({
         careInstructions: care,
         isActive,
         featured,
+        unlimitedStock,
         variants,
       }).then((result) => setMessage(result.success ? "Product saved." : result.message || "Could not save product.")).catch((error: unknown) => setMessage(error instanceof Error ? error.message : "Could not save product."));
     });
@@ -102,7 +104,7 @@ export function ProductEditForm({
             className="w-full rounded-md border bg-background px-3 py-2"
           />
         </label>
-        <label>
+        <label className={unlimitedStock || variants.length ? "hidden" : undefined}>
           <span className="mb-2 block text-sm text-muted-foreground">
             Inventory
           </span>
@@ -202,8 +204,15 @@ export function ProductEditForm({
       </div>
       <section className="space-y-3 border-t pt-5">
         <div>
-          <h2 className="text-sm font-semibold">Size inventory</h2>
-          <p className="mt-1 text-xs text-muted-foreground">Each size is reserved independently. Saving all sizes reconciles this product.</p>
+          <h2 className="text-sm font-semibold">Stock</h2>
+          <label className="mt-3 flex items-start gap-3 rounded-md border p-3 text-sm">
+            <input type="checkbox" className="mt-1" checked={unlimitedStock} onChange={(event) => setUnlimitedStock(event.target.checked)} />
+            <span>
+              <span className="block font-medium">Unlimited, made after order</span>
+              <span className="mt-1 block text-xs text-muted-foreground">Customers can always order this piece. To stop orders, untick a size below or unpublish the product. Untick this to count stock instead.</span>
+            </span>
+          </label>
+          {!unlimitedStock && <p className="mt-3 text-xs text-muted-foreground">Each size is reserved independently. A size with 0 available shows as sold out.</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <input value={newSize} onChange={(event) => setNewSize(event.target.value)} placeholder="Add size" className="rounded-md border bg-background px-3 py-2 text-sm" />
@@ -216,12 +225,12 @@ export function ProductEditForm({
         </div>
         <div className="overflow-x-auto border">
           <table className="min-w-full text-left text-sm">
-            <thead className="border-b bg-muted/40"><tr><th className="p-3">Size</th><th className="p-3">SKU</th><th className="p-3">Available</th><th className="p-3">Active</th></tr></thead>
+            <thead className="border-b bg-muted/40"><tr><th className="p-3">Size</th><th className="p-3">SKU</th>{!unlimitedStock && <th className="p-3">Available</th>}<th className="p-3">Taking orders</th></tr></thead>
             <tbody>{variants.map((variant, index) => <tr key={variant.id} className="border-b last:border-0">
               <td className="p-3 font-medium">{variant.size === "ONE_SIZE" ? "One size" : variant.size}</td>
               <td className="p-3 text-xs text-muted-foreground">{variant.sku}</td>
-              <td className="p-3"><input aria-label={`${variant.size} inventory`} type="number" min="0" value={variant.inventoryCount} onChange={(event) => setVariants((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, inventoryCount: Math.max(0, Number(event.target.value) || 0) } : item))} className="w-24 rounded-md border bg-background px-3 py-2" /></td>
-              <td className="p-3"><label className="flex items-center gap-2"><input type="checkbox" checked={variant.isActive} onChange={(event) => setVariants((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: event.target.checked } : item))} /> Active</label></td>
+              {!unlimitedStock && <td className="p-3"><input aria-label={`${variant.size} inventory`} type="number" min="0" value={variant.inventoryCount} onChange={(event) => setVariants((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, inventoryCount: Math.max(0, Number(event.target.value) || 0) } : item))} className="w-24 rounded-md border bg-background px-3 py-2" /></td>}
+              <td className="p-3"><label className="flex items-center gap-2"><input type="checkbox" checked={variant.isActive} onChange={(event) => setVariants((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, isActive: event.target.checked } : item))} /> {variant.isActive ? "On" : "Off"}</label></td>
             </tr>)}</tbody>
           </table>
         </div>

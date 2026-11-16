@@ -46,12 +46,14 @@ export default function AddProduct() {
       inventoryCount: 0,
       isActive: true,
       featured: false,
+      unlimitedStock: true,
       categoryId: "",
       materials: "",
       careInstructions: "",
     },
   });
   const isSubmitting = form.formState.isSubmitting;
+  const unlimitedStock = form.watch("unlimitedStock") ?? true;
 
   const onFormSubmit = async (
     data: ProductFormValues,
@@ -223,7 +225,7 @@ export default function AddProduct() {
 
             <div className="border-t border-black/15 pt-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--brand)]">Pricing &amp; inventory</p>
-              <p className="mt-1 text-sm text-black/60">Set the selling price, internal cost, and available units.</p>
+              <p className="mt-1 text-sm text-black/60">Set the selling price, internal cost, and how stock is handled.</p>
             </div>
             <Controller
               name="price"
@@ -288,13 +290,28 @@ export default function AddProduct() {
             {/* /> */}
             {/* expiration date for discounted prices */}
 
-            {/* <h2>stock quantity</h2> */}
-            {/* change to stock quantity */}
+            <Controller
+              name="unlimitedStock"
+              control={form.control}
+              render={({ field }) => (
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-medium">Stock</legend>
+                  <label className="flex items-start gap-3 border border-black/15 p-3 text-sm">
+                    <input type="radio" name="stock-mode" className="mt-1" checked={field.value !== false} onChange={() => field.onChange(true)} />
+                    <span><span className="block font-medium">Unlimited, made after order</span><span className="mt-0.5 block text-xs text-black/60">Never sells out. Switch sizes off later to pause orders.</span></span>
+                  </label>
+                  <label className="flex items-start gap-3 border border-black/15 p-3 text-sm">
+                    <input type="radio" name="stock-mode" className="mt-1" checked={field.value === false} onChange={() => field.onChange(false)} />
+                    <span><span className="block font-medium">Limited stock</span><span className="mt-0.5 block text-xs text-black/60">Enter how many you have. A size at 0 shows as sold out.</span></span>
+                  </label>
+                </fieldset>
+              )}
+            />
             <Controller
               name="inventoryCount"
               control={form.control}
               render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
+                <Field data-invalid={fieldState.invalid} className={unlimitedStock || (form.watch("sizes")?.length ?? 0) > 0 ? "hidden" : undefined}>
                   <FieldLabel htmlFor="inventoryCount">
                     Inventory Count
                   </FieldLabel>
@@ -361,7 +378,7 @@ export default function AddProduct() {
                 </Field>
               )}
             />
-            <div className="space-y-2">
+            <div className={unlimitedStock ? "hidden" : "space-y-2"}>
               <label htmlFor="size-inventory" className="text-sm font-medium">Inventory by size</label>
               <p className="text-xs text-muted-foreground">Enter one quantity per size. Example: S:2, M:5, L:1. Leave blank for a one-size product.</p>
               <Input

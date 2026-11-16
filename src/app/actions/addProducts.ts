@@ -47,6 +47,7 @@ export async function createProductAction(formData: FormData) {
       .filter(Boolean),
     isActive: formData.get("isActive") !== "false",
     featured: formData.get("featured") === "true",
+    unlimitedStock: formData.get("unlimitedStock") !== "false",
     materials: formData.get("materials") || undefined,
     careInstructions: formData.get("careInstructions") || undefined,
   });
@@ -69,7 +70,9 @@ export async function createProductAction(formData: FormData) {
       message: "Validation failed",
     };
   }
-  if ((validatedProductFields.data.sizes?.length || 0) > 0 && validatedProductFields.data.sizes?.some((size) => variantInventory[size] === undefined)) {
+  const unlimitedStock = validatedProductFields.data.unlimitedStock ?? true;
+  // Counted stock needs a number for every size; unlimited pieces do not.
+  if (!unlimitedStock && (validatedProductFields.data.sizes?.length || 0) > 0 && validatedProductFields.data.sizes?.some((size) => variantInventory[size] === undefined)) {
     return { message: "Enter an inventory count for every listed size before publishing." };
   }
   const priceKobo = parseNairaToKobo(validatedProductFields.data.price);
@@ -92,6 +95,7 @@ export async function createProductAction(formData: FormData) {
     sku: validatedProductFields.data.sku ?? null,
     isActive: validatedProductFields.data.isActive,
     featured: validatedProductFields.data.featured,
+    unlimitedStock,
     sizes: validatedProductFields.data.sizes ?? [],
     inventoryMigrationStatus: "migrated",
     materials: validatedProductFields.data.materials ?? null,

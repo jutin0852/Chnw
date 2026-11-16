@@ -15,6 +15,8 @@ export type StoreProduct = {
   inventoryCount: number | null;
   inventoryMigrationStatus: string;
   inventoryReconciliationRequired: boolean;
+  /** Made after ordering: never sells out, only active sizes are offered. */
+  unlimitedStock?: boolean;
   variants: { id: string; size: string; sku: string; inventoryCount: number; isActive: boolean }[];
   images: { id: number; imageUrl: string; altText: string | null }[];
   category: { name: string; slug?: string } | null;

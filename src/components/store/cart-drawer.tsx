@@ -104,7 +104,7 @@ export default function CartDrawer({ open, onClose, fallbackImage, emptyContent,
                 <span className="label text-[15px] tracking-[0.02em]">{formatStorePrice(cartTotal)}</span>
               </div>
               <p className="text-[13px] text-stone">Delivery is calculated at the next step.</p>
-              <Link href="/checkout" onClick={onClose} className="pill pill--red w-full !py-[17px] text-[16px]">Checkout · pay with Paystack</Link>
+              <Link href="/checkout" onClick={onClose} className="pill pill--red w-full !py-[17px] text-[16px]">Checkout securely</Link>
             </div>
           </>
         )}

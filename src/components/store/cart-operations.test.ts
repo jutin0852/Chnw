@@ -53,3 +53,21 @@ test("sold-out and invalid quantity requests do not create a cart row", () => {
   assert.equal(addCartItems([], { ...product, inventoryCount: 0 }).cart.length, 0);
   assert.equal(addCartItems([], { ...product, inventoryCount: null }).cart.length, 0);
 });
+
+test("unlimited (made-to-order) pieces ignore stock counts but respect switched-off sizes", () => {
+  const madeToOrder: StoreProduct = {
+    ...product, inventoryCount: 0, unlimitedStock: true, inventoryMigrationStatus: "migrated",
+    variants: [
+      { id: "v-m", size: "M", sku: "S-M", inventoryCount: 0, isActive: true },
+      { id: "v-l", size: "L", sku: "S-L", inventoryCount: 0, isActive: false },
+    ],
+  };
+  const added = addCartItems([], madeToOrder, "M", 5);
+  assert.equal(added.result.success, true);
+  assert.equal(added.cart[0].quantity, 5);
+  const off = addCartItems([], madeToOrder, "L");
+  assert.equal(off.result.success, false);
+  assert.match(off.result.message, /not available/);
+  const tooMany = addCartItems(added.cart, madeToOrder, "M", 95);
+  assert.equal(tooMany.result.success, false);
+});

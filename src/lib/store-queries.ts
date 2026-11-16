@@ -5,5 +5,5 @@ import { getAllProducts as queryAllProducts, getProductBySlug as queryProductByS
 // instead of waiting on the database every click. Admin changes show up within the revalidate window.
 const REVALIDATE_SECONDS = 30;
 
-export const getAllProducts = unstable_cache(queryAllProducts, ["store-all-products"], { revalidate: REVALIDATE_SECONDS, tags: ["products"] });
-export const getProductBySlug = unstable_cache(queryProductBySlug, ["store-product-by-slug"], { revalidate: REVALIDATE_SECONDS, tags: ["products"] });
+export const getAllProducts = unstable_cache(queryAllProducts, ["store-all-products-v2"], { revalidate: REVALIDATE_SECONDS, tags: ["products"] });
+export const getProductBySlug = unstable_cache(queryProductBySlug, ["store-product-by-slug-v2"], { revalidate: REVALIDATE_SECONDS, tags: ["products"] });

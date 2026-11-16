@@ -18,6 +18,7 @@ export const ProductSchema = z.object({
     .optional(),
   isActive: z.boolean().default(true).optional(),
   featured: z.boolean().default(false).optional(),
+  unlimitedStock: z.boolean().default(true).optional(),
   sizes: z.array(z.string()).optional(), // ["XS", "S", "M", "L", "XL"]
   materials: z.string().optional(),
   careInstructions: z.string().optional(),

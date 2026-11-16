@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "node scripts/run-tests.cjs src/components/store/cart-operations.test.ts src/lib/inventory-reservation.test.ts src/lib/product-variant-inventory.test.ts src/lib/money.test.ts src/lib/invoice-math.test.ts src/lib/invoice-input.test.ts"
+    "test": "node scripts/run-tests.cjs src/components/store/cart-operations.test.ts src/lib/inventory-reservation.test.ts src/lib/product-variant-inventory.test.ts src/lib/money.test.ts src/lib/bachs.test.ts src/lib/invoice-math.test.ts src/lib/invoice-input.test.ts"
   },
   "dependencies": {
     "@better-auth/infra": "^0.4.28",

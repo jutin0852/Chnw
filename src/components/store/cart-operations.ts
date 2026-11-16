@@ -2,6 +2,9 @@ import type { CartItem, ProductCustomizations, StoreProduct } from "./cart-conte
 
 export type AddToCartResult = { success: boolean; message: string };
 
+/** Checkout accepts up to 99 of one line. */
+const MAX_PER_LINE = 99;
+
 export function addCartItems(
   cart: CartItem[],
   product: StoreProduct,
@@ -26,14 +29,15 @@ export function addCartItems(
     ? variant?.inventoryCount ?? 0
     : product.inventoryCount ?? 0;
   if (product.inventoryMigrationStatus === "migrated" && !variant) return reject("Choose an available size.");
-  if (inBag > stock) {
-    return reject(`Stock has changed. Only ${stock} available; please adjust your bag.`);
-  }
-  if (stock <= 0) return reject("This product is sold out.");
-  const remaining = stock - inBag;
-  if (remaining === 0) return reject("Available quantity already in your bag.");
-  if (quantity > remaining) {
-    return reject(`You can add only ${remaining} more. Please adjust your quantity.`);
+  if (product.unlimitedStock) {
+    if (variant && !variant.isActive) return reject("This size is not available right now.");
+    if (inBag + quantity > MAX_PER_LINE) return reject(`You can order up to ${MAX_PER_LINE} of one piece at a time.`);
+  } else {
+    if (inBag > stock) return reject(`Stock has changed. Only ${stock} available; please adjust your bag.`);
+    if (stock <= 0) return reject("This product is sold out.");
+    const remaining = stock - inBag;
+    if (remaining === 0) return reject("Available quantity already in your bag.");
+    if (quantity > remaining) return reject(`You can add only ${remaining} more. Please adjust your quantity.`);
   }
   const sameCustomizations = (item: CartItem) => JSON.stringify(item.customizations || {}) === JSON.stringify(customizations || {});
   const existing = cart.some((item) => item.id === product.id && item.variantId === cartVariantId && sameCustomizations(item));

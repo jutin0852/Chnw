@@ -116,6 +116,8 @@ export const products = pgTable("products", {
   sizes: jsonb("sizes").$type<string[]>().default([]), // ["XS", "S", "M", "L", "XL"]
   inventoryMigrationStatus: text("inventory_migration_status").notNull().default("legacy"), // legacy, needs_reconciliation, migrated
   inventoryReconciliationRequired: boolean("inventory_reconciliation_required").notNull().default(false),
+  // Made after the order is placed, so it never sells out. Stock counts are ignored while this is on.
+  unlimitedStock: boolean("unlimited_stock").notNull().default(true),
   materials: text("materials"),
   careInstructions: text("care_instructions"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -183,6 +185,8 @@ export const orders = pgTable("orders", {
   checkoutIdempotencyKey: text("checkout_idempotency_key"),
   paymentIntentId: text("payment_intent_id"),
   paymentAuthorizationUrl: text("payment_authorization_url"),
+  // The provider's own id for the checkout (Bachs chk_...), needed to look the payment up later.
+  paymentCheckoutId: text("payment_checkout_id"),
   paymentStatus: text("payment_status").default("pending"), // pending, paid, payment_initialization_failed, expired, refund_required
   reservationStatus: text("reservation_status").notNull().default("none"), // none, active, converted, released
   reservationExpiresAt: timestamp("reservation_expires_at"),
@@ -268,6 +272,8 @@ export const orderItems = pgTable("order_items", {
     notes?: string;
   }>(),
   quantity: integer("quantity").notNull(),
+  // Whether checkout took this quantity out of stock, so cancelling or expiring only returns what was taken.
+  stockReserved: boolean("stock_reserved").notNull().default(true),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),

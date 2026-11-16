@@ -42,8 +42,12 @@ export default function ProductDetail({ product, number, film }: { product: Deta
   const { cart, removeItem, setBagOpen } = useCart();
   const { feedback, addWithFeedback, dismissFeedback } = useCartFeedback();
   const selectedVariant = product.variants.find((variant) => variant.size === (size || "ONE_SIZE"));
-  const anyStock = product.inventoryMigrationStatus === "migrated" ? product.variants.some((v) => v.isActive && v.inventoryCount > 0) : (product.inventoryCount ?? 0) > 0;
-  const stock = product.inventoryMigrationStatus === "migrated" ? (selectedVariant?.inventoryCount ?? 0) : (product.inventoryCount ?? 0);
+  // Unlimited (made-to-order) pieces never sell out; a size is offered while it is switched on.
+  const sizeOpen = (v: { isActive: boolean; inventoryCount: number }) => v.isActive && (product.unlimitedStock || v.inventoryCount > 0);
+  const anyStock = product.inventoryMigrationStatus === "migrated" ? product.variants.some(sizeOpen) : product.unlimitedStock || (product.inventoryCount ?? 0) > 0;
+  const stock = product.unlimitedStock
+    ? (product.inventoryMigrationStatus === "migrated" && selectedVariant && !selectedVariant.isActive ? 0 : 99)
+    : product.inventoryMigrationStatus === "migrated" ? (selectedVariant?.inventoryCount ?? 0) : (product.inventoryCount ?? 0);
   const isCustomWear = product.category?.slug === MADE_TO_ORDER_CATEGORY_SLUG;
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
   const whatsappHref = whatsappNumber
@@ -165,7 +169,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
                   <div className="grid grid-cols-5 gap-2">
                     {realSizes.map((item) => {
                       const v = product.variants.find((variant) => variant.size === item);
-                      const ok = product.inventoryMigrationStatus !== "migrated" || Boolean(v?.isActive && v.inventoryCount > 0);
+                      const ok = product.inventoryMigrationStatus !== "migrated" || Boolean(v && sizeOpen(v));
                       const active = size === item;
                       return (
                         <button

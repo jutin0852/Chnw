@@ -44,6 +44,7 @@ export async function changeOrderStatus(orderId: string, status: string) {
       if (!allowedTransitions[currentStatus]?.includes(nextStatus)) throw new Error(`Cannot change an ${currentStatus} order to ${nextStatus}.`);
       if (nextStatus === "cancelled" && order.paymentStatus === "paid") {
         for (const item of order.items) {
+          if (!item.stockReserved) continue;
           if (item.variantId) await tx.update(productVariants).set({ inventoryCount: sql`${productVariants.inventoryCount} + ${item.quantity}`, updatedAt: new Date() }).where(eq(productVariants.id, item.variantId));
           else if (item.productId) await tx.update(products).set({ inventoryCount: sql`coalesce(${products.inventoryCount}, 0) + ${item.quantity}`, updatedAt: new Date() }).where(eq(products.id, item.productId));
         }

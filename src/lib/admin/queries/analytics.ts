@@ -40,6 +40,7 @@ export async function getAdminAnalytics(): Promise<AdminAnalytics> {
         .where(
           and(
             eq(products.isActive, true),
+            eq(products.unlimitedStock, false),
             sql`coalesce(${products.inventoryCount}, 0) <= 5`,
           ),
         ),

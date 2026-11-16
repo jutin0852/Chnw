@@ -51,6 +51,7 @@ export async function updateProduct(
     careInstructions?: string;
     isActive: boolean;
     featured: boolean;
+    unlimitedStock?: boolean;
     variants?: { id: string; size: string; sku: string; inventoryCount: number; isActive: boolean }[];
   },
 ) {
@@ -89,6 +90,7 @@ export async function updateProduct(
         message: "A product with this name already exists.",
       };
   }
+  const unlimitedStock = values.unlimitedStock ?? true;
   await db.transaction(async (tx) => {
     const nextVariants = values.variants || [];
     if (nextVariants.length) {
@@ -101,7 +103,8 @@ export async function updateProduct(
       }
       for (const variant of nextVariants) {
         if (!variant.id.startsWith("new-")) await tx.execute(sql`select id from product_variants where id = ${variant.id} for update`);
-        if (!variant.isActive && !variant.id.startsWith("new-")) {
+        // Unlimited pieces hold no stock, so a size can be switched off at any time.
+        if (!unlimitedStock && !variant.isActive && !variant.id.startsWith("new-")) {
           const activeReservations = await tx.select({ id: orders.id }).from(orders).innerJoin(orderItems, eq(orderItems.orderId, orders.id)).where(and(eq(orderItems.variantId, variant.id), eq(orders.reservationStatus, "active"))).limit(1);
           if (activeReservations.length) throw new Error("This size has an active reservation and cannot be disabled yet.");
         }
@@ -127,6 +130,7 @@ export async function updateProduct(
       careInstructions: values.careInstructions?.trim() || null,
       isActive: values.isActive,
       featured: values.featured,
+      unlimitedStock,
       updatedAt: new Date(),
         inventoryMigrationStatus: "migrated",
         inventoryReconciliationRequired: false,
@@ -146,6 +150,7 @@ export async function updateProduct(
         careInstructions: values.careInstructions?.trim() || null,
         isActive: values.isActive,
         featured: values.featured,
+        unlimitedStock,
         updatedAt: new Date(),
       }).where(eq(products.id, productId));
     }

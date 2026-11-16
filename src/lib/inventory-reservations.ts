@@ -41,6 +41,7 @@ export async function releaseInventoryReservation(
   const variantQuantities = new Map<string, number>();
   const legacyQuantities = new Map<string, number>();
   for (const item of order.items) {
+    if (!item.stockReserved) continue;
     if (item.variantId) variantQuantities.set(item.variantId, (variantQuantities.get(item.variantId) || 0) + item.quantity);
     else if (item.productId) legacyQuantities.set(item.productId, (legacyQuantities.get(item.productId) || 0) + item.quantity);
   }

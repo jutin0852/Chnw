@@ -8,7 +8,9 @@ import { auth } from "../../lib/auth";
 import { transactionDb } from "../../lib/transaction-db";
 import { categories, orderItems, orders, products, productImages, productVariants } from "../../lib/schema";
 import { initializePaystackPayment } from "@/lib/paystack";
-import { getReservationExpiry, releaseInventoryReservation } from "@/lib/inventory-reservations";
+import { initializeBachsPayment } from "@/lib/bachs";
+import { activePaymentProvider } from "@/lib/payments";
+import { getReservationExpiry, getReservationMinutes, releaseInventoryReservation } from "@/lib/inventory-reservations";
 import { koboToNairaDecimal, parseNairaToKobo } from "@/lib/money";
 
 const checkoutSchema = z.object({
@@ -153,6 +155,8 @@ export async function createOrder(formData: FormData): Promise<CheckoutResult> {
       const legacyQuantities = new Map<string, number>();
       const variantQuantities = new Map<string, number>();
       for (const item of lineItems) {
+        // Made-to-order pieces are not taken out of stock; the size checks above still apply.
+        if (item.product.unlimitedStock) continue;
         if (item.variant) variantQuantities.set(item.variant.id, (variantQuantities.get(item.variant.id) || 0) + item.quantity);
         else legacyQuantities.set(item.product.id, (legacyQuantities.get(item.product.id) || 0) + item.quantity);
       }
@@ -215,6 +219,7 @@ export async function createOrder(formData: FormData): Promise<CheckoutResult> {
           size: size || null,
           customizations: customizations || null,
           quantity,
+          stockReserved: !product.unlimitedStock,
           unitPrice: koboToNairaDecimal(unitPriceKobo),
           totalPrice: koboToNairaDecimal(totalPriceKobo),
         })),
@@ -224,19 +229,34 @@ export async function createOrder(formData: FormData): Promise<CheckoutResult> {
     });
     if (result.kind === "existing") return { success: true, authorizationUrl: result.authorizationUrl };
     try {
-      const payment = await initializePaystackPayment({
-        email: parsed.data.customerEmail,
-        amountKobo: result.totalKobo,
-        reference: result.paymentIntentId!,
-        // Paystack appends the transaction reference to this URL after payment.
-        // Supplying our own query parameter here can create a malformed duplicate
-        // reference for transfer redirects.
-        callbackUrl: `${createSiteUrl(requestHeaders)}/checkout/verify`,
-        orderId: result.id,
-        orderNumber: result.orderNumber,
-      });
+      const siteUrl = createSiteUrl(requestHeaders);
+      const payment = activePaymentProvider() === "bachs"
+        ? await initializeBachsPayment({
+            email: parsed.data.customerEmail,
+            name: parsed.data.customerName,
+            amountKobo: result.totalKobo,
+            reference: result.paymentIntentId!,
+            // Bachs appends its short checkout code, which its API cannot look up, so the
+            // order's own reference is carried in the address and resolved on the verify page.
+            successUrl: `${siteUrl}/checkout/verify?provider=bachs&ref=${encodeURIComponent(result.paymentIntentId!)}`,
+            cancelUrl: `${siteUrl}/checkout`,
+            orderId: result.id,
+            orderNumber: result.orderNumber,
+            expiresInMinutes: getReservationMinutes(),
+          })
+        : await initializePaystackPayment({
+            email: parsed.data.customerEmail,
+            amountKobo: result.totalKobo,
+            reference: result.paymentIntentId!,
+            // Paystack appends the transaction reference to this URL after payment.
+            // Supplying our own query parameter here can create a malformed duplicate
+            // reference for transfer redirects.
+            callbackUrl: `${siteUrl}/checkout/verify`,
+            orderId: result.id,
+            orderNumber: result.orderNumber,
+          });
       const savedAuthorization = await transactionDb.transaction(async (tx) => tx.update(orders)
-        .set({ paymentAuthorizationUrl: payment.authorization_url, updatedAt: new Date() })
+        .set({ paymentAuthorizationUrl: payment.authorization_url, paymentCheckoutId: "checkoutId" in payment && typeof payment.checkoutId === "string" ? payment.checkoutId : null, updatedAt: new Date() })
         .where(and(eq(orders.id, result.id), eq(orders.paymentStatus, "pending"), eq(orders.reservationStatus, "active"), isNull(orders.paymentAuthorizationUrl)))
         .returning({ id: orders.id }));
       if (savedAuthorization.length !== 1) throw new Error("This checkout reservation has expired. Please return to your bag and try again.");

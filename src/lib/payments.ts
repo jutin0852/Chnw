@@ -4,6 +4,7 @@ import { db } from "./db";
 import { transactionDb } from "./transaction-db";
 import { orders } from "./schema";
 import { matchesPaystackPayment, verifyPaystackPayment } from "./paystack";
+import { bachsPaymentOutcome, getBachsCheckoutSession, matchesBachsPayment, type PaymentOutcome } from "./bachs";
 import { brandedEmail, escapeEmailHtml, sendEmail } from "./email";
 import { isReservationActive, releaseInventoryReservation } from "./inventory-reservations";
 import { formatNairaDecimal, parseNairaToKobo } from "./money";
@@ -24,24 +25,73 @@ function escapeHtml(value: string) {
   })[character] || character);
 }
 
+/** One payment as a provider reports it, reduced to what finalising an order needs. */
+type ProviderPayment = { outcome: PaymentOutcome; matches: (reference: string, expectedAmountKobo: bigint) => boolean };
+
+export type PaymentProvider = "paystack" | "bachs";
+
+/** Which provider new checkouts use. Set PAYMENT_PROVIDER, or it follows whichever key is configured. */
+export function activePaymentProvider(): PaymentProvider {
+  const configured = process.env.PAYMENT_PROVIDER?.trim().toLowerCase();
+  if (configured === "bachs" || configured === "paystack") return configured;
+  return process.env.BACHS_SECRET_KEY && !process.env.PAYSTACK_SECRET_KEY ? "bachs" : "paystack";
+}
+
 export async function verifyAndFinalizePaystackPayment(reference: string): Promise<PaymentVerificationResult> {
+  return finalizeOrderPayment(reference, async () => {
+    const payment = await verifyPaystackPayment(reference);
+    return {
+      outcome: payment.status === "success" ? "success" : ["failed", "abandoned", "reversed"].includes(payment.status) ? "failed" : "pending",
+      matches: (expectedReference, expectedAmountKobo) => matchesPaystackPayment(payment, expectedReference, expectedAmountKobo),
+    };
+  });
+}
+
+/**
+ * Bachs returns the customer with our order reference (we put it in success_url) plus a short
+ * checkout code its API cannot look up, so the real checkout id saved on the order is used instead.
+ */
+export async function verifyBachsPaymentForReference(reference: string): Promise<PaymentVerificationResult> {
+  const order = await db.query.orders.findFirst({ where: eq(orders.paymentIntentId, reference) });
+  if (!order) return { state: "failed", message: "We could not find this payment." };
+  if (order.paymentStatus === "paid") return { state: "paid", orderNumber: order.orderNumber };
+  if (!order.paymentCheckoutId) return { state: "pending", message: "We are still checking your payment. Please refresh this page in a moment." };
+  return verifyAndFinalizeBachsPayment(order.paymentCheckoutId);
+}
+
+/** Bachs identifies a payment by its checkout id; the order is found through the reference set on it. */
+export async function verifyAndFinalizeBachsPayment(checkoutId: string): Promise<PaymentVerificationResult> {
+  let session;
+  try {
+    session = await getBachsCheckoutSession(checkoutId);
+  } catch (error) {
+    return { state: "pending", message: error instanceof Error ? error.message : "We are still checking your payment." };
+  }
+  if (!session.reference) return { state: "failed", message: "We could not find this payment." };
+  return finalizeOrderPayment(session.reference, async () => ({
+    outcome: bachsPaymentOutcome(session),
+    matches: (expectedReference, expectedAmountKobo) => matchesBachsPayment(session, expectedReference, expectedAmountKobo),
+  }));
+}
+
+async function finalizeOrderPayment(reference: string, fetchPayment: () => Promise<ProviderPayment>): Promise<PaymentVerificationResult> {
   const order = await db.query.orders.findFirst({ where: eq(orders.paymentIntentId, reference) });
   if (!order) return { state: "failed", message: "We could not find this payment." };
   if (order.paymentStatus === "paid") return { state: "paid", orderNumber: order.orderNumber };
 
-  let payment;
+  let payment: ProviderPayment;
   try {
-    payment = await verifyPaystackPayment(reference);
+    payment = await fetchPayment();
   } catch (error) {
     return { state: "pending", message: error instanceof Error ? error.message : "We are still checking your payment." };
   }
 
-  if (payment.status !== "success") {
+  if (payment.outcome !== "success") {
     if (!isReservationActive(order.reservationStatus, order.reservationExpiresAt)) {
       await transactionDb.transaction(async (tx) => releaseInventoryReservation(tx, order.id, "expired"));
       return { state: "failed", message: "This checkout reservation has expired. Please return to your bag and start again." };
     }
-    return { state: "pending", message: ["failed", "abandoned", "reversed"].includes(payment.status) ? "Your payment was not completed. Your reserved stock is still held for a short time so you can try again." : "Your payment is still being confirmed. Please wait a moment and refresh this page." };
+    return { state: "pending", message: payment.outcome === "failed" ? "Your payment was not completed. Your reserved stock is still held for a short time so you can try again." : "Your payment is still being confirmed. Please wait a moment and refresh this page." };
   }
 
   let expectedAmountKobo: bigint | null = null;
@@ -50,7 +100,7 @@ export async function verifyAndFinalizePaystackPayment(reference: string): Promi
   } catch {
     expectedAmountKobo = null;
   }
-  if (expectedAmountKobo === null || !matchesPaystackPayment(payment, reference, expectedAmountKobo)) {
+  if (expectedAmountKobo === null || !payment.matches(reference, expectedAmountKobo)) {
     await transactionDb.transaction(async (tx) => {
       await tx.execute(sql`select "id" from "orders" where "payment_intent_id" = ${reference} for update`);
       await releaseInventoryReservation(tx, order.id, "expired");

@@ -107,12 +107,19 @@ export function ProductManagement({
                     {product.sku || "-"}
                   </td>
                   <td className="p-3 font-medium">{formatStorePrice(product.price)}</td>
+                  {product.unlimitedStock ? (
+                  <td className="p-3">
+                    Unlimited
+                    <div className="text-[10px] uppercase tracking-[.08em] text-muted-foreground">Made after order</div>
+                  </td>
+                  ) : (
                   <td
                     className={`p-3 ${(product.inventoryCount ?? 0) <= 5 ? "font-medium text-destructive" : ""}`}
                   >
                     {product.inventoryMigrationStatus === "migrated" ? product.variants.filter((variant) => variant.isActive).reduce((total, variant) => total + variant.inventoryCount, 0) : product.inventoryCount ?? 0}
                     <div className="text-[10px] uppercase tracking-[.08em] text-muted-foreground">{product.inventoryReconciliationRequired ? "Needs size reconciliation" : product.inventoryMigrationStatus === "migrated" ? "By size" : "Legacy"}</div>
                   </td>
+                  )}
                   <td className="p-3">
                     <Link
                       href={`/admin/product-list/${product.id}`}
