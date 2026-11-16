@@ -168,7 +168,7 @@ async function finalizeOrderPayment(reference: string, fetchPayment: () => Promi
         orderNumber: result.orderNumber,
         customerName: confirmation.customerName,
         totalLabel: formatNairaDecimal(confirmation.totalAmount),
-        itemCount: confirmation.items.reduce((total, item) => total + item.quantity, 0),
+        items: confirmation.items.map((item) => ({ name: item.name, size: item.size, quantity: item.quantity })),
       });
     }
     return { state: result.state, orderNumber: result.orderNumber } as PaymentVerificationResult;

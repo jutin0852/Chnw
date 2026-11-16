@@ -4,12 +4,11 @@ import { db } from "./db";
 import { pushSubscriptions, user } from "./schema";
 import { getSiteUrl } from "./site-url";
 import { VAPID_PUBLIC_KEY } from "@/config/order-alerts";
+import { describeOrderedItems, type OrderAlert } from "./order-alert-text";
 
 // New-order alerts for the team, sent as web push notifications.
 // Runs only when an order first becomes paid: one small read of the team's devices, no polling.
 // The phone receives the alert from Apple's or Google's push service, not from the database.
-
-export type OrderAlert = { orderId: string; orderNumber: string; customerName: string; totalLabel: string; itemCount: number };
 
 export function orderAlertsConfigured() {
   return Boolean(process.env.VAPID_PRIVATE_KEY);
@@ -56,7 +55,7 @@ export async function sendTeamPush(payload: { title: string; body: string; url: 
 export function sendNewOrderAlert(order: OrderAlert) {
   return sendTeamPush({
     title: `New order · ${order.totalLabel}`,
-    body: `${order.customerName} placed ${order.orderNumber} (${order.itemCount} ${order.itemCount === 1 ? "item" : "items"}).`,
+    body: describeOrderedItems(order.customerName, order.items),
     url: `/admin/orders/${order.orderId}`,
     tag: `order-${order.orderId}`,
   });
