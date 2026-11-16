@@ -61,11 +61,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart(nextCart);
   }
 
+  // The saved bag lives in this browser only, so it is read after the first render (the server has none).
   useEffect(() => {
     const savedCart = window.localStorage.getItem(storageKey);
     if (savedCart) {
       try {
         const savedItems = JSON.parse(savedCart) as CartItem[];
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of browser storage after hydration
         saveCart(
           savedItems
             .filter((item) => item.quantity > 0)
@@ -75,6 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         window.localStorage.removeItem(storageKey);
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of browser storage after hydration
     setLoaded(true);
   }, []);
 

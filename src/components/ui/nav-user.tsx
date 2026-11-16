@@ -4,6 +4,7 @@ import { IconDotsVertical, IconExternalLink, IconLogout } from "@tabler/icons-re
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -81,7 +82,7 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild><a href="/"><IconExternalLink />View storefront</a></DropdownMenuItem>
+            <DropdownMenuItem asChild><Link href="/"><IconExternalLink />View storefront</Link></DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem disabled={pending} onSelect={(event) => { event.preventDefault(); void handleSignOut(); }}>
               <IconLogout />

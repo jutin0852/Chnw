@@ -12,7 +12,7 @@ export default function RegisterPage() {
       label="Customer account"
       heading="Create your account."
     >
-      <Suspense fallback={null}><AccountAccessForm mode="register" /></Suspense>
+      <Suspense fallback={<div className="min-h-[430px]" aria-hidden="true" />}><AccountAccessForm mode="register" /></Suspense>
     </AuthShell>
   );
 }

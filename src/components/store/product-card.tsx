@@ -49,8 +49,9 @@ export default function ProductCard({
         <span className="label text-[11px] text-stone">
           {[number, product.category?.name].filter(Boolean).join(" · ")}
         </span>
-        <span className="flex items-baseline justify-between gap-3">
-          <span className={`font-display leading-[1.1] transition-colors group-hover:text-thread ${large ? "text-[26px] sm:text-[30px]" : "text-[20px] sm:text-[22px]"}`}>
+        {/* Phones: price under the name (two narrow columns); wider screens: name and price on one line. */}
+        <span className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+          <span className={`min-w-0 font-display leading-[1.1] transition-colors group-hover:text-thread ${large ? "text-[26px] sm:text-[30px]" : "text-[20px] sm:text-[22px]"}`}>
             {shortName(card.name)}
           </span>
           <span className="label shrink-0 text-[13px] tracking-[0.04em] text-ink">{formatStorePrice(product.price)}</span>

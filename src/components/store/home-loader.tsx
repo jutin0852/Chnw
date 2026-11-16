@@ -14,7 +14,7 @@ export default function HomeLoader({ photos }: { photos: string[] }) {
         <span className="loader__window" aria-hidden="true">
           {frames.map((src, i) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="" style={{ animationDelay: `${-((frames.length - i) % frames.length) * 0.2}s` }} />
+            <img key={src} src={src} alt="" width={260} height={325} decoding="async" style={{ animationDelay: `${-((frames.length - i) % frames.length) * 0.2}s` }} />
           ))}
         </span>
         <span className="loader__mask">

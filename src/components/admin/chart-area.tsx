@@ -83,11 +83,12 @@ export function ChartAreaInteractive({ data = [] }: { data?: DayPoint[] }) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState<RangeKey>("90d");
 
-  React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange("30d");
-    }
-  }, [isMobile]);
+  // Phones start on the last 30 days; adjusted during render when the screen size is known.
+  const [sizedFor, setSizedFor] = React.useState(isMobile);
+  if (sizedFor !== isMobile) {
+    setSizedFor(isMobile);
+    if (isMobile) setTimeRange("30d");
+  }
 
   const range = RANGES[timeRange];
   const series = React.useMemo(() => fillDays(data, range.days), [data, range.days]);

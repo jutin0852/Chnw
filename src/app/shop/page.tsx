@@ -9,11 +9,22 @@ import { getProductFilms } from "@/lib/films-queries";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Shop all pieces",
-  description: "Every CHNW piece: reworked denim skirts, dresses, sets and faux leather totes, made to order in UK sizes 4 to 20.",
-  alternates: { canonical: "/shop" },
-};
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ category?: string }> }): Promise<Metadata> {
+  const { category } = await searchParams;
+  const match = category ? (await getAllProducts()).find((p) => p.category?.slug === category)?.category : undefined;
+  if (!match) {
+    return {
+      title: "Shop all pieces",
+      description: "Every CHNW piece: reworked denim skirts, dresses, sets and faux leather totes, made to order in UK sizes 4 to 20.",
+      alternates: { canonical: "/shop" },
+    };
+  }
+  return {
+    title: `${match.name}`,
+    description: `CHNW ${match.name.toLowerCase()}: reworked, small-batch pieces made to order in Nigeria. Delivered across Nigeria.`,
+    alternates: { canonical: `/shop?category=${category}` },
+  };
+}
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const [{ category }, products, productFilm] = await Promise.all([searchParams, getAllProducts(), getProductFilms()]);

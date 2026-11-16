@@ -6,7 +6,7 @@ import { useCart, type CartItem } from "./cart-context";
 import { primaryProductAlt, primaryProductImage } from "./brand-assets";
 import { formatStorePrice } from "./currency";
 import { multiplyNairaDecimal } from "@/lib/money";
-import { sizeLabel } from "./catalog";
+import { cloudinaryThumb, sizeLabel } from "./catalog";
 
 type CartDrawerProps = {
   open: boolean;
@@ -73,7 +73,7 @@ export default function CartDrawer({ open, onClose, fallbackImage, emptyContent,
                 <li key={JSON.stringify([item.id, item.size || "", item.customizations || {}])} className="flex gap-4 border-b border-[var(--line)] py-4">
                   <Link href={editHref(item)} onClick={onClose} className="shrink-0" aria-label={`Edit ${item.productName}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={item.images?.[0]?.imageUrl || primaryProductImage || fallbackImage} alt={item.images?.[0]?.altText || primaryProductAlt} className="h-[120px] w-24 bg-mist object-cover" />
+                    <img src={cloudinaryThumb(item.images?.[0]?.imageUrl || primaryProductImage || fallbackImage, 240)} loading="lazy" decoding="async" alt={item.images?.[0]?.altText || primaryProductAlt} className="h-[120px] w-24 bg-mist object-cover" />
                   </Link>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <div className="flex justify-between gap-3">

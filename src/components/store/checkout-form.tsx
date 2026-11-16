@@ -7,6 +7,7 @@ import { createOrder } from "../../app/actions/createOrder";
 import BrandLogo from "./brand-logo";
 import { primaryProductAlt, primaryProductImage } from "./brand-assets";
 import { useCart } from "./cart-context";
+import { cloudinaryThumb } from "./catalog";
 import { formatStorePrice } from "./currency";
 import { multiplyNairaDecimal } from "@/lib/money";
 
@@ -111,7 +112,7 @@ export default function CheckoutForm({ initialCustomer }: { initialCustomer?: { 
           <div className="mt-7 divide-y divide-black/15 border-y border-black">
             {cart.map((item) => (
               <div key={JSON.stringify([item.id, item.size || "", item.customizations || {}])} className="flex gap-4 py-5">
-                <img src={item.images?.[0]?.imageUrl || primaryProductImage} alt={item.images?.[0]?.altText || item.productName || primaryProductAlt} className="h-28 w-24 bg-white object-cover" />
+                <img src={cloudinaryThumb(item.images?.[0]?.imageUrl || primaryProductImage, 240)} decoding="async" alt={item.images?.[0]?.altText || item.productName || primaryProductAlt} className="h-28 w-24 bg-white object-cover" />
                 <div className="flex flex-1 flex-col justify-between">
                   <div className="flex justify-between gap-2">
                     <div>

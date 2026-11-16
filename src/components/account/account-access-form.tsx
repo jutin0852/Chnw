@@ -6,14 +6,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { sendVerificationEmail, signIn, signUp } from "@/lib/auth-client";
 
 export function AccountAccessForm({ mode }: { mode: "sign-in" | "register" }) {
-  const router = useRouter(); const search = useSearchParams(); const [name, setName] = useState(""); const [email, setEmail] = useState(search.get("email") || ""); const [password, setPassword] = useState(""); const [showPassword, setShowPassword] = useState(false); const [message, setMessage] = useState(""); const [pending, setPending] = useState(false); const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null); const [secondsRemaining, setSecondsRemaining] = useState(0);
+  const router = useRouter(); const search = useSearchParams(); const [name, setName] = useState(""); const [email, setEmail] = useState(search.get("email") || ""); const [password, setPassword] = useState(""); const [showPassword, setShowPassword] = useState(false); const [message, setMessage] = useState(""); const [pending, setPending] = useState(false); const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null); const [now, setNow] = useState(() => Date.now());
   const isRegister = mode === "register";
   const returnTo = search.get("returnTo")?.startsWith("/") ? search.get("returnTo")! : "/account";
+  // Countdown before another verification email can be sent; the clock only ticks while it runs.
+  const secondsRemaining = resendAvailableAt ? Math.max(0, Math.ceil((resendAvailableAt - now) / 1000)) : 0;
   useEffect(() => {
-    if (!resendAvailableAt) { setSecondsRemaining(0); return; }
-    const updateCountdown = () => setSecondsRemaining(Math.max(0, Math.ceil((resendAvailableAt - Date.now()) / 1000)));
-    updateCountdown();
-    const timer = window.setInterval(updateCountdown, 1000);
+    if (!resendAvailableAt) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, [resendAvailableAt]);
   async function submit(event: React.FormEvent) {
@@ -23,7 +23,7 @@ export function AccountAccessForm({ mode }: { mode: "sign-in" | "register" }) {
     if (result.error) {
       if (!isRegister && (result.error.code === "EMAIL_NOT_VERIFIED" || result.error.message === "Email not verified")) {
         setMessage("EMAIL_NOT_VERIFIED");
-        setResendAvailableAt(Date.now() + 60_000);
+        { const sentAt = Date.now(); setNow(sentAt); setResendAvailableAt(sentAt + 60_000); }
       } else setMessage(result.error.message || "We could not complete that request.");
       return;
     }
@@ -38,7 +38,7 @@ export function AccountAccessForm({ mode }: { mode: "sign-in" | "register" }) {
     setPending(false);
     if (result.error) { setMessage(result.error.message || "We could not resend the verification email."); return; }
     setMessage("VERIFICATION_SENT");
-    setResendAvailableAt(Date.now() + 60_000);
+    { const sentAt = Date.now(); setNow(sentAt); setResendAvailableAt(sentAt + 60_000); }
   }
   return <form onSubmit={submit} className="mt-9 space-y-6">
     {isRegister && <label className="block"><span className="field-label">Full name</span><input required value={name} onChange={(event) => setName(event.target.value)} className="field-input" /></label>}

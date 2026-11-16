@@ -10,6 +10,8 @@ import { pieceNumbers } from "../../../components/store/catalog";
 import { getAllProducts, getProductBySlug } from "../../../lib/store-queries";
 import { getProductFilms } from "@/lib/films-queries";
 import { getSiteUrl } from "@/lib/site-url";
+import { breadcrumbJsonLd, jsonLd, productJsonLd, productShareImage } from "@/lib/seo";
+import { formatStorePrice } from "@/components/store/currency";
 
 export const dynamic = "force-dynamic";
 
@@ -17,9 +19,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return { title: "Product unavailable", robots: { index: false, follow: false } };
-  const description = (product.description || `${product.productName} from CHNW.`).slice(0, 160);
+  const price = formatStorePrice(product.price);
+  const summary = product.description?.replace(/\s+/g, " ").trim() || `${product.productName}, made to order by CHNW in Nigeria.`;
+  // Lead with the price so it shows in WhatsApp and Google snippets; keep within ~160 characters.
+  const description = `${price}. ${summary}`.slice(0, 160);
   const image = product.images[0]?.imageUrl;
-  const imageUrl = image ? new URL(image, getSiteUrl()).toString() : undefined;
+  const imageUrl = image ? productShareImage(new URL(image, getSiteUrl()).toString(), product.productName, product.price) : undefined;
   return {
     title: product.productName,
     description,
@@ -29,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: `${product.productName} | CHNW`,
       description,
       url: `/product/${product.slug}`,
-      images: imageUrl ? [{ url: imageUrl, alt: product.images[0]?.altText || product.productName }] : undefined,
+      images: imageUrl ? [{ url: imageUrl, width: 1200, height: 630, alt: product.images[0]?.altText || product.productName }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -60,6 +65,12 @@ export default async function ProductPage({
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(productJsonLd(product)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd([
+        { name: "Shop", path: "/shop" },
+        ...(product.category?.slug ? [{ name: product.category.name, path: `/shop?category=${product.category.slug}` }] : []),
+        { name: product.productName, path: `/product/${product.slug}` },
+      ])) }} />
       <SiteHeader />
       <main id="main" tabIndex={-1} className="min-h-screen bg-paper pb-24 text-ink outline-none lg:pb-0">
         <Suspense fallback={<div className="min-h-screen" />}>

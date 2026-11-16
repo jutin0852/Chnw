@@ -38,7 +38,11 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
   const headerRef = useRef<HTMLElement>(null);
 
   // Close the collection panel on navigation, Escape or a click outside the header.
-  useEffect(() => setCollectionOpen(false), [pathname]);
+  const [openedOn, setOpenedOn] = useState(pathname);
+  if (openedOn !== pathname) {
+    setOpenedOn(pathname);
+    setCollectionOpen(false);
+  }
   useEffect(() => {
     if (!collectionOpen) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setCollectionOpen(false);
@@ -221,7 +225,7 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
         </nav>
         <div className="flex items-center justify-between border-t border-white/15 px-5 py-5">
           <Link href="/account" onClick={() => setMenuOpen(false)} className="label py-2 text-[12px]">Account</Link>
-          <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noreferrer" className="label py-2 text-[12px]">@chnw.ng</a>
+          <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noopener noreferrer" className="label py-2 text-[12px]">@chnw.ng</a>
         </div>
       </div>
 

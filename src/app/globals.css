@@ -256,7 +256,7 @@
 .skip-link {
   position: fixed; left: 16px; top: 16px; z-index: 120;
   padding: 0.6em 1em; background: var(--ink); color: var(--paper);
-  font-family: var(--font-courier), monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--font-courier), "Courier New", monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
   transform: translateY(-200%);
 }
 .skip-link:focus-visible { transform: none; }
@@ -267,6 +267,10 @@ html.lenis, html.lenis body { height: auto; }
 
 /* Hidden-until-revealed, only when JS runs and motion is allowed (set before first paint). */
 .motion [data-split], .motion [data-reveal] { visibility: hidden; }
+/* Slow phones: if scripts have not taken over within 2.4s, show the content anyway. Once the page is
+   loaded (html.is-loaded) the failsafe no longer applies and GSAP owns visibility again. */
+html.motion:not(.is-loaded) [data-split], html.motion:not(.is-loaded) [data-reveal] { animation: reveal-failsafe 0s 2.4s forwards; }
+@keyframes reveal-failsafe { to { visibility: visible; } }
 .split-line { padding-bottom: 0.1em; margin-bottom: -0.1em; }
 
 /* Page curtain: a quick paper fade between storefront pages. GSAP owns its opacity. */
@@ -278,10 +282,11 @@ html.lenis, html.lenis body { height: auto; }
 #loader {
   position: fixed; inset: 0; z-index: 100; overflow: hidden;
   background: var(--brand); color: var(--paper);
-  animation: loader-failsafe 0s 7s forwards; /* never trap anyone if scripts fail */
+  /* Never hold anyone longer than ~3s, even when scripts are slow to arrive on mobile data. */
+  animation: loader-failsafe 0.35s ease 2.1s forwards;
 }
 html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader[hidden] { display: none; }
-@keyframes loader-failsafe { to { visibility: hidden; } }
+@keyframes loader-failsafe { to { opacity: 0; visibility: hidden; } }
 .loader__stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 28px); }
 .loader__mask { display: block; overflow: hidden; }
 .loader__word {
@@ -301,14 +306,14 @@ html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader
 @keyframes loader-flick { 0% { opacity: 1; } 12.5%, 100% { opacity: 0; } }
 .loader__count {
   position: absolute; top: calc(50% - clamp(72px, 12vw, 170px)); right: clamp(16px, 12vw, 220px);
-  font-family: var(--font-courier), monospace; font-size: 16px; font-variant-numeric: tabular-nums;
+  font-family: var(--font-courier), "Courier New", monospace; font-size: 16px; font-variant-numeric: tabular-nums;
 }
-.loader__meta { position: absolute; bottom: 24px; font-family: var(--font-courier), monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; }
+.loader__meta { position: absolute; bottom: 24px; font-family: var(--font-courier), "Courier New", monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; }
 
 /* ───────────── Storefront components ───────────── */
 
 /* Mono labels: Courier Prime, after Deadly Ponies' typewriter discipline. */
-.label { font-family: var(--font-courier), ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.label { font-family: var(--font-courier), "Courier New", ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
 
 /* Underline that draws in from the left on hover (nav and text links). */
 .draw {
@@ -374,7 +379,7 @@ html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader
 }
 
 /* ───────────── Forms (sign in, register, recovery) ───────────── */
-.field-label { display: block; margin-bottom: 6px; font-family: var(--font-courier), ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.field-label { display: block; margin-bottom: 6px; font-family: var(--font-courier), "Courier New", ui-monospace, monospace; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
 .field-input {
   width: 100%; padding: 10px 0; background: transparent; font-size: 16px; outline: none; border-radius: 0;
   border: 0; border-bottom: 1px solid var(--ink); transition: border-color 0.3s ease, box-shadow 0.3s ease;

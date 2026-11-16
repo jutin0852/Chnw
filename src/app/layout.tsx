@@ -7,6 +7,7 @@ import StoreMotion from "../components/store/store-motion";
 import { getSiteUrl } from "@/lib/site-url";
 import { GoogleAnalytics } from "../components/analytics/google-analytics";
 import { BRAND } from "@/config/brand";
+import { isIndexable, jsonLd } from "@/lib/seo";
 
 // Fonts are bundled in ./fonts (not fetched from Google at build time, so builds never depend on it).
 // Display: Bodoni Moda (the serif in CHNW's own graphics). Labels: Courier Prime (typewriter).
@@ -71,6 +72,13 @@ export const metadata: Metadata = {
     apple: [{ url: "/brand/favicon-192.png", type: "image/png", sizes: "192x192" }],
   },
   keywords: [...BRAND.keywords],
+  // Previews stay out of Google; the live store is indexed.
+  robots: isIndexable() ? { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } } : { index: false, follow: false },
+  // Paste the code from Google Search Console / Bing Webmaster Tools into these variables once the domain is live.
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.BING_SITE_VERIFICATION } : undefined,
+  },
   openGraph: {
     type: "website",
     locale: BRAND.locale,
@@ -105,15 +113,23 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd({
           "@context": "https://schema.org",
-          "@type": "ClothingStore",
-          name: BRAND.name,
-          url: getSiteUrl(),
-          logo: `${getSiteUrl()}/brand/favicon-192.png`,
-          description: BRAND.description,
-          areaServed: BRAND.areaServed,
-          sameAs: [BRAND.social.instagram, BRAND.social.facebook, BRAND.social.tiktok].filter(Boolean),
+          "@graph": [
+            {
+              "@type": "ClothingStore",
+              "@id": `${getSiteUrl()}/#store`,
+              name: BRAND.name,
+              url: getSiteUrl(),
+              logo: `${getSiteUrl()}/brand/favicon-192.png`,
+              image: `${getSiteUrl()}/brand/og-image.png`,
+              description: BRAND.description,
+              areaServed: BRAND.areaServed,
+              currenciesAccepted: "NGN",
+              sameAs: [BRAND.social.instagram, BRAND.social.facebook, BRAND.social.tiktok].filter(Boolean),
+            },
+            { "@type": "WebSite", "@id": `${getSiteUrl()}/#website`, name: BRAND.name, url: getSiteUrl(), publisher: { "@id": `${getSiteUrl()}/#store` } },
+          ],
         }) }} />
         <CartProvider>{children}</CartProvider>
         <StoreMotion />

@@ -126,7 +126,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
           <div className="flex flex-col gap-3">
             <p className="label text-[12px] text-thread">{[number, isCustomWear ? "Made for you" : "Made to order"].filter(Boolean).join(" · ")}</p>
             <h1 className="text-[44px] leading-[0.98] sm:text-[58px]">{product.productName}</h1>
-            {!isCustomWear && <p className="label text-[20px] tracking-[0.02em]">{formatStorePrice(product.price)}</p>}
+            {!isCustomWear && <p className="label mt-2 text-[20px] tracking-[0.02em]">{formatStorePrice(product.price)}</p>}
             {group && (
               <div role="group" aria-label={group.label} className="flex flex-wrap items-center gap-2 pt-1">
                 <span className="label mr-1 text-[12px] text-stone">{group.label}</span>
@@ -153,7 +153,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
               <p className="label text-[12px]">How custom orders work</p>
               <p className="text-[15px] leading-[1.6] text-[#3d3832]">This piece is made to order around you. Message us on WhatsApp to agree your size, timing and details.</p>
               {whatsappHref ? (
-                <a href={whatsappHref} target="_blank" rel="noreferrer" className="pill pill--red w-full">Enquire on WhatsApp</a>
+                <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="pill pill--red w-full">Enquire on WhatsApp</a>
               ) : (
                 <button disabled className="pill pill--ink w-full">WhatsApp enquiries coming soon</button>
               )}
@@ -241,7 +241,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
 
               <div className="hidden flex-col gap-3 lg:flex">
                 <button type="button" disabled={!isAvailable} onClick={addProduct} className="pill pill--red w-full !py-[18px] text-[16px]">{ctaLabel}</button>
-                {whatsappHref && <a href={whatsappHref} target="_blank" rel="noreferrer" className="pill pill--line w-full">Ask about it on WhatsApp</a>}
+                {whatsappHref && <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="pill pill--line w-full">Ask about it on WhatsApp</a>}
               </div>
             </>
           )}
@@ -268,7 +268,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--line)] bg-paper/95 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm lg:hidden">
           <div className="mx-auto flex max-w-lg items-center gap-3">
             {whatsappHref && (
-              <a href={whatsappHref} target="_blank" rel="noreferrer" aria-label="Ask about it on WhatsApp" className="label grid h-[52px] shrink-0 place-items-center rounded-full border border-ink px-4 text-[11px]">Ask</a>
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" aria-label="Ask about it on WhatsApp" className="label grid h-[52px] shrink-0 place-items-center rounded-full border border-ink px-4 text-[11px]">Ask</a>
             )}
             <button type="button" disabled={!isAvailable} onClick={addProduct} className="pill pill--red h-[52px] flex-1 !px-4 !py-0 text-[15px]">{ctaLabel}</button>
           </div>

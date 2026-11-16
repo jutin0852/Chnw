@@ -12,7 +12,7 @@ export default function AccountSignInPage() {
       label="Customer account"
       heading="Welcome back."
     >
-      <Suspense fallback={null}><AccountAccessForm mode="sign-in" /></Suspense>
+      <Suspense fallback={<div className="min-h-[340px]" aria-hidden="true" />}><AccountAccessForm mode="sign-in" /></Suspense>
     </AuthShell>
   );
 }

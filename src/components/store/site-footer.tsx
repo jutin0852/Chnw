@@ -11,7 +11,7 @@ export default function SiteFooter() {
         <div className="grid gap-12 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
           <div className="flex max-w-md flex-col items-start gap-5">
             <p className="font-display text-[28px] leading-[1.1] sm:text-[34px]">Questions about fit, or a piece made your way?</p>
-            <a href={chatHref} target="_blank" rel="noreferrer" className="pill pill--line">
+            <a href={chatHref} target="_blank" rel="noopener noreferrer" className="pill pill--line">
               {whatsapp ? "Chat with us on WhatsApp" : "Message us on Instagram"}
             </a>
           </div>
@@ -31,7 +31,7 @@ export default function SiteFooter() {
             </div>
             <div className="flex flex-col gap-3">
               <span className="label text-stone">CHNW</span>
-              <a href={BRAND.social.instagram} target="_blank" rel="noreferrer" className="draw w-fit">Instagram</a>
+              <a href={BRAND.social.instagram} target="_blank" rel="noopener noreferrer" className="draw w-fit">Instagram</a>
               <Link href="/privacy" className="draw w-fit">Privacy</Link>
               <Link href="/terms" className="draw w-fit">Terms</Link>
             </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { CartFeedback } from "./use-cart-feedback";
 import { formatStorePrice } from "./currency";
 import { multiplyNairaDecimal } from "@/lib/money";
-import { sizeLabel } from "./catalog";
+import { cloudinaryThumb, sizeLabel } from "./catalog";
 
 export default function CartAddToast({
   feedback,
@@ -34,7 +34,7 @@ export default function CartAddToast({
         <div className="stitch my-3" />
         <div className="flex gap-3 pb-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {image && <img src={image.imageUrl} alt={image.altText || feedback.product.productName} className="h-20 w-16 bg-mist object-cover" />}
+          {image && <img src={cloudinaryThumb(image.imageUrl, 200)} decoding="async" alt={image.altText || feedback.product.productName} className="h-20 w-16 bg-mist object-cover" />}
           <div className="min-w-0 flex-1">
             <p className="font-display text-[20px] leading-tight">{feedback.product.productName}</p>
             <p className="label mt-1 text-[11px] text-stone">

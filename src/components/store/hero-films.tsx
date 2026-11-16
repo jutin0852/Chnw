@@ -21,6 +21,7 @@ export default function HeroFilms({ films }: { films: Film[] }) {
     });
     if (prefersReducedMotion()) {
       refs.current.forEach((v) => v?.pause());
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- the motion preference is only known in the browser
       setPlaying(false);
     }
   }, [films]);

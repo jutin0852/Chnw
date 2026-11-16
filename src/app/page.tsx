@@ -121,7 +121,7 @@ export default async function Home() {
           <section aria-labelledby="reels-title" className="py-20 lg:py-28">
             <div className="mx-auto mb-8 flex max-w-[1500px] flex-wrap items-baseline justify-between gap-4 px-4 sm:px-8 lg:px-12">
               <h2 id="reels-title" data-split="lines" className="font-display text-[40px] leading-none sm:text-[56px]">Worn by you, filmed by us</h2>
-              <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noreferrer" className="label draw py-1 text-[13px]">@chnw.ng on Instagram</a>
+              <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noopener noreferrer" className="label draw py-1 text-[13px]">@chnw.ng on Instagram</a>
             </div>
             <ul className="mx-auto flex max-w-[1500px] snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:px-8 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-12 [&::-webkit-scrollbar]:hidden">
               {lookFilms.map((film, i) => {
