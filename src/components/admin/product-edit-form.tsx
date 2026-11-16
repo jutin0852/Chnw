@@ -219,7 +219,7 @@ export function ProductEditForm({
           <button type="button" className="rounded-md border px-3 py-2 text-sm" onClick={() => {
             const size = newSize.trim();
             if (!size || variants.some((variant) => variant.size.toLowerCase() === size.toLowerCase())) return;
-            setVariants((current) => [...current, { id: `new-${crypto.randomUUID()}`, size, sku: `${sku || product.sku || `GS-${product.id}`}-${size.toUpperCase().replace(/[^A-Z0-9]+/g, "-")}`, inventoryCount: 0, isActive: true }]);
+            setVariants((current) => [...current, { id: `new-${crypto.randomUUID()}`, size, sku: `${sku || product.sku || `CHNW-${product.id}`}-${size.toUpperCase().replace(/[^A-Z0-9]+/g, "-")}`, inventoryCount: 0, isActive: true }]);
             setNewSize("");
           }}>Add size</button>
         </div>

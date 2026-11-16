@@ -181,8 +181,9 @@ export async function createOrder(formData: FormData): Promise<CheckoutResult> {
         BigInt(0),
       );
       if (totalKobo <= BigInt(0)) throw new Error("The order total must be greater than zero.");
-      const orderNumber = `GS-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
-      const paymentReference = `GS-${crypto.randomUUID().replaceAll("-", "")}`;
+      // Older orders keep their GS- codes; new ones use the CHNW- prefix.
+      const orderNumber = `CHNW-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+      const paymentReference = `CHNW-${crypto.randomUUID().replaceAll("-", "")}`;
 
       const [order] = await tx
         .insert(orders)

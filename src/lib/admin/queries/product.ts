@@ -72,7 +72,7 @@ export async function createProduct(product: NewProduct, images: string[], varia
       sizes.map((size) => ({
         productId: newProduct.id,
         size,
-        sku: `${product.sku || `GS-${newProduct.id}`}-${size.toUpperCase().replace(/[^A-Z0-9]+/g, "-")}`,
+        sku: `${product.sku || `CHNW-${newProduct.id}`}-${size.toUpperCase().replace(/[^A-Z0-9]+/g, "-")}`,
         inventoryCount: product.sizes?.length ? Math.max(0, variantInventory[size] ?? 0) : product.inventoryCount ?? 0,
         isActive: newProduct.isActive ?? true,
       })),
