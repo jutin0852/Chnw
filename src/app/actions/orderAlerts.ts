@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { requireAdmin } from "@/lib/admin-auth";
 import { db } from "@/lib/db";
-import { sendTeamPush } from "@/lib/push";
+import { orderAlertsConfigured, sendTeamPush } from "@/lib/push";
 import { pushSubscriptions } from "@/lib/schema";
 
 type DeviceSubscription = { endpoint: string; keys: { p256dh: string; auth: string } };
@@ -23,7 +23,12 @@ export async function enableOrderAlerts(subscription: DeviceSubscription) {
   await db.insert(pushSubscriptions)
     .values({ userId: admin.id, endpoint: subscription.endpoint, p256dh: subscription.keys.p256dh, auth: subscription.keys.auth, userAgent })
     .onConflictDoUpdate({ target: pushSubscriptions.endpoint, set: { userId: admin.id, p256dh: subscription.keys.p256dh, auth: subscription.keys.auth, userAgent } });
-  return { success: true, message: "Order alerts are on for this device." };
+  return {
+    success: true,
+    message: orderAlertsConfigured()
+      ? "Order alerts are on for this device."
+      : "This device is saved, but alerts will only start once VAPID_PRIVATE_KEY is added in Vercel.",
+  };
 }
 
 export async function disableOrderAlerts(endpoint: string) {
@@ -34,6 +39,9 @@ export async function disableOrderAlerts(endpoint: string) {
 
 export async function sendTestOrderAlert() {
   await requireAdmin();
-  await sendTeamPush({ title: "Order alerts are working", body: "You will get a notification like this when a customer pays for an order.", url: "/admin/orders", tag: "test-alert" });
-  return { success: true, message: "Test alert sent. It should arrive in a few seconds." };
+  if (!orderAlertsConfigured()) return { success: false, message: "Alerts are not finished on the server yet: VAPID_PRIVATE_KEY is missing in Vercel." };
+  const delivered = await sendTeamPush({ title: "Order alerts are working", body: "You will get a notification like this when a customer pays for an order.", url: "/admin/orders", tag: "test-alert" });
+  return delivered
+    ? { success: true, message: `Test alert sent to ${delivered} ${delivered === 1 ? "device" : "devices"}. It should arrive in a few seconds.` }
+    : { success: false, message: "The test alert could not be delivered. Turn alerts off and on again on this device." };
 }

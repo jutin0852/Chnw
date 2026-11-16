@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell, BellOff, BellRing } from "lucide-react";
 import { disableOrderAlerts, enableOrderAlerts, sendTestOrderAlert } from "@/app/actions/orderAlerts";
+import { VAPID_PUBLIC_KEY } from "@/config/order-alerts";
 
-type State = "loading" | "unsupported" | "install-first" | "blocked" | "off" | "on";
+type State = "loading" | "unsupported" | "update-ios" | "install-first" | "blocked" | "off" | "on";
 
 function urlBase64ToUint8Array(base64: string) {
   const padded = (base64 + "=".repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/");
@@ -27,12 +28,13 @@ export function OrderAlertsToggle() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const panel = useRef<HTMLDivElement>(null);
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const publicKey = VAPID_PUBLIC_KEY;
 
   useEffect(() => {
     void (async () => {
       const supported = "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
-      if (!supported || !publicKey) return setState(isIos() && !isInstalled() ? "install-first" : "unsupported");
+      // iPhone only allows notifications in the Home Screen app, on iOS 16.4 or later.
+      if (!supported) return setState(isIos() ? (isInstalled() ? "update-ios" : "install-first") : "unsupported");
       if (Notification.permission === "denied") return setState("blocked");
       const registration = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
       const existing = await registration.pushManager.getSubscription();
@@ -58,7 +60,7 @@ export function OrderAlertsToggle() {
       }
       const registration = await navigator.serviceWorker.ready;
       const subscription = (await registration.pushManager.getSubscription())
-        ?? await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicKey!) });
+        ?? await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(publicKey) });
       const json = subscription.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } };
       const result = await enableOrderAlerts(json);
       setMessage(result.message);
@@ -116,6 +118,7 @@ export function OrderAlertsToggle() {
           {state === "off" && <p className="mt-2 leading-5 text-black/70">Get a notification on this device when a customer pays for an order.</p>}
           {state === "install-first" && <p className="mt-2 leading-5 text-black/70">On iPhone, add CHNW to your Home Screen first: tap Share, then Add to Home Screen. Open CHNW from the Home Screen, sign in and come back here.</p>}
           {state === "blocked" && <p className="mt-2 leading-5 text-black/70">Notifications are blocked for CHNW. Allow them in this device&apos;s settings, then reopen this page.</p>}
+          {state === "update-ios" && <p className="mt-2 leading-5 text-black/70">This iPhone needs iOS 16.4 or later for notifications. Update it in Settings, General, Software Update.</p>}
           {state === "unsupported" && <p className="mt-2 leading-5 text-black/70">This browser cannot show notifications. Try Chrome, Edge or Safari, or the CHNW app on your Home Screen.</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {state === "off" && <button type="button" disabled={busy} onClick={turnOn} className="bg-[var(--brand)] px-3 py-2 text-xs font-semibold uppercase tracking-[.08em] text-white disabled:opacity-60">{busy ? "Turning on..." : "Turn on alerts"}</button>}
