@@ -6,6 +6,7 @@ import { orders } from "./schema";
 import { matchesPaystackPayment, verifyPaystackPayment } from "./paystack";
 import { bachsPaymentOutcome, getBachsCheckoutSession, matchesBachsPayment, type PaymentOutcome } from "./bachs";
 import { brandedEmail, escapeEmailHtml, sendEmail } from "./email";
+import { sendNewOrderAlert } from "./push";
 import { isReservationActive, releaseInventoryReservation } from "./inventory-reservations";
 import { formatNairaDecimal, parseNairaToKobo } from "./money";
 
@@ -129,6 +130,7 @@ async function finalizeOrderPayment(reference: string, fetchPayment: () => Promi
         state: "paid",
         orderNumber: lockedOrder.orderNumber,
         confirmation: {
+          orderId: lockedOrder.id,
           customerEmail: lockedOrder.customerEmail,
           customerName: lockedOrder.customerName,
           totalAmount: lockedOrder.totalAmount,
@@ -160,6 +162,14 @@ async function finalizeOrderPayment(reference: string, fetchPayment: () => Promi
       } catch (error) {
         console.error("Order confirmation email failed", error);
       }
+      // Team alert: sent once, only on the first transition to paid.
+      await sendNewOrderAlert({
+        orderId: confirmation.orderId,
+        orderNumber: result.orderNumber,
+        customerName: confirmation.customerName,
+        totalLabel: formatNairaDecimal(confirmation.totalAmount),
+        itemCount: confirmation.items.reduce((total, item) => total + item.quantity, 0),
+      });
     }
     return { state: result.state, orderNumber: result.orderNumber } as PaymentVerificationResult;
   } catch {

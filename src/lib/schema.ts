@@ -163,6 +163,17 @@ export const siteFilms = pgTable("site_films", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Devices (phones, browsers) where a team member turned on new-order alerts.
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: text("id").primaryKey().$defaultFn(() => createId()),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Orders table
 export const orders = pgTable("orders", {
   id: text("id")

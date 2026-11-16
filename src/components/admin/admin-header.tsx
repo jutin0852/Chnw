@@ -1,6 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import AdminHeaderTitle from "./admin-header-title";
+import { OrderAlertsToggle } from "./order-alerts-toggle";
 
 export function AdminHeader() {
   
@@ -13,7 +14,10 @@ export function AdminHeader() {
           className="mx-2 data-[orientation=vertical]:h-4"
         />
         <AdminHeaderTitle />
-        <div className="ml-auto hidden text-[10px] font-semibold uppercase tracking-[.14em] text-[var(--brand)] sm:block">CHNW</div>
+        <div className="ml-auto flex items-center gap-3">
+          <OrderAlertsToggle />
+          <div className="hidden text-[10px] font-semibold uppercase tracking-[.14em] text-[var(--brand)] sm:block">CHNW</div>
+        </div>
       </div>
     </header>
   );
