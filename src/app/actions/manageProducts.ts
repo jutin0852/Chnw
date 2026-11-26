@@ -2,6 +2,7 @@
 
 import { requireAdmin } from "../../lib/admin-auth";
 import { db } from "../../lib/db";
+import { transactionDb } from "../../lib/transaction-db";
 import { orderItems, orders, productImages, productVariants, products } from "../../lib/schema";
 import { and, asc, eq, sql } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
@@ -134,62 +135,43 @@ export async function updateProduct(
       };
   }
   const unlimitedStock = values.unlimitedStock ?? true;
-  await db.transaction(async (tx) => {
-    const nextVariants = values.variants || [];
-    if (nextVariants.length) {
-      const sizes = new Set<string>();
-      const skus = new Set<string>();
-      for (const variant of nextVariants) {
-        if (!variant.size.trim() || sizes.has(variant.size.trim().toLowerCase()) || skus.has(variant.sku.trim().toLowerCase()) || !Number.isInteger(variant.inventoryCount) || variant.inventoryCount < 0) throw new Error("Please enter valid, unique size inventory and SKU values.");
-        sizes.add(variant.size.trim().toLowerCase());
-        skus.add(variant.sku.trim().toLowerCase());
-      }
-      for (const variant of nextVariants) {
-        if (!variant.id.startsWith("new-")) await tx.execute(sql`select id from product_variants where id = ${variant.id} for update`);
-        // Unlimited pieces hold no stock, so a size can be switched off at any time.
-        if (!unlimitedStock && !variant.isActive && !variant.id.startsWith("new-")) {
-          const activeReservations = await tx.select({ id: orders.id }).from(orders).innerJoin(orderItems, eq(orderItems.orderId, orders.id)).where(and(eq(orderItems.variantId, variant.id), eq(orders.reservationStatus, "active"))).limit(1);
-          if (activeReservations.length) throw new Error("This size has an active reservation and cannot be disabled yet.");
+  // The HTTP driver (db) cannot run interactive transactions; this one uses WebSockets.
+  try {
+    await transactionDb.transaction(async (tx) => {
+      const nextVariants = values.variants || [];
+      if (nextVariants.length) {
+        const sizes = new Set<string>();
+        const skus = new Set<string>();
+        for (const variant of nextVariants) {
+          if (!variant.size.trim() || sizes.has(variant.size.trim().toLowerCase()) || skus.has(variant.sku.trim().toLowerCase()) || !Number.isInteger(variant.inventoryCount) || variant.inventoryCount < 0) throw new Error("Please enter valid, unique size inventory and SKU values.");
+          sizes.add(variant.size.trim().toLowerCase());
+          skus.add(variant.sku.trim().toLowerCase());
         }
-        const existing = variant.id.startsWith("new-") ? [] : await tx.select({ id: productVariants.id }).from(productVariants).where(and(eq(productVariants.id, variant.id), eq(productVariants.productId, productId)));
-        if (existing.length) {
-          await tx.update(productVariants).set({ size: variant.size.trim(), sku: variant.sku.trim(), inventoryCount: variant.inventoryCount, isActive: variant.isActive, updatedAt: new Date() }).where(eq(productVariants.id, variant.id));
-        } else {
-          await tx.insert(productVariants).values({ productId, size: variant.size.trim(), sku: variant.sku.trim(), inventoryCount: variant.inventoryCount, isActive: variant.isActive });
+        for (const variant of nextVariants) {
+          if (!variant.id.startsWith("new-")) await tx.execute(sql`select id from product_variants where id = ${variant.id} for update`);
+          // Unlimited pieces hold no stock, so a size can be switched off at any time.
+          if (!unlimitedStock && !variant.isActive && !variant.id.startsWith("new-")) {
+            const activeReservations = await tx.select({ id: orders.id }).from(orders).innerJoin(orderItems, eq(orderItems.orderId, orders.id)).where(and(eq(orderItems.variantId, variant.id), eq(orders.reservationStatus, "active"))).limit(1);
+            if (activeReservations.length) throw new Error("This size has an active reservation and cannot be disabled yet.");
+          }
+          const existing = variant.id.startsWith("new-") ? [] : await tx.select({ id: productVariants.id }).from(productVariants).where(and(eq(productVariants.id, variant.id), eq(productVariants.productId, productId)));
+          if (existing.length) {
+            await tx.update(productVariants).set({ size: variant.size.trim(), sku: variant.sku.trim(), inventoryCount: variant.inventoryCount, isActive: variant.isActive, updatedAt: new Date() }).where(eq(productVariants.id, variant.id));
+          } else {
+            await tx.insert(productVariants).values({ productId, size: variant.size.trim(), sku: variant.sku.trim(), inventoryCount: variant.inventoryCount, isActive: variant.isActive });
+          }
         }
-      }
-      const variantInventoryTotal = nextVariants.reduce((total, variant) => total + variant.inventoryCount, 0);
-      await tx.update(products).set({
-      productName: name,
-      slug,
-      description: values.description?.trim() || null,
-      price: koboToNairaDecimal(priceKobo),
-      costPrice: costPriceKobo === null ? null : koboToNairaDecimal(costPriceKobo),
-      inventoryCount: variantInventoryTotal,
-      sku: values.sku?.trim() || null,
-      categoryId: values.categoryId || null,
-      sizes: nextVariants.map((variant) => variant.size),
-      colours: cleanColours(values.colours),
-      materials: values.materials?.trim() || null,
-      careInstructions: values.careInstructions?.trim() || null,
-      isActive: values.isActive,
-      featured: values.featured,
-      unlimitedStock,
-      updatedAt: new Date(),
-        inventoryMigrationStatus: "migrated",
-        inventoryReconciliationRequired: false,
-      }).where(eq(products.id, productId));
-    } else {
-      await tx.update(products).set({
+        const variantInventoryTotal = nextVariants.reduce((total, variant) => total + variant.inventoryCount, 0);
+        await tx.update(products).set({
         productName: name,
         slug,
         description: values.description?.trim() || null,
         price: koboToNairaDecimal(priceKobo),
         costPrice: costPriceKobo === null ? null : koboToNairaDecimal(costPriceKobo),
-        inventoryCount: values.inventoryCount ?? 0,
+        inventoryCount: variantInventoryTotal,
         sku: values.sku?.trim() || null,
         categoryId: values.categoryId || null,
-        sizes: values.sizes ?? [],
+        sizes: nextVariants.map((variant) => variant.size),
         colours: cleanColours(values.colours),
         materials: values.materials?.trim() || null,
         careInstructions: values.careInstructions?.trim() || null,
@@ -197,9 +179,38 @@ export async function updateProduct(
         featured: values.featured,
         unlimitedStock,
         updatedAt: new Date(),
-      }).where(eq(products.id, productId));
-    }
-  });
+          inventoryMigrationStatus: "migrated",
+          inventoryReconciliationRequired: false,
+        }).where(eq(products.id, productId));
+      } else {
+        await tx.update(products).set({
+          productName: name,
+          slug,
+          description: values.description?.trim() || null,
+          price: koboToNairaDecimal(priceKobo),
+          costPrice: costPriceKobo === null ? null : koboToNairaDecimal(costPriceKobo),
+          inventoryCount: values.inventoryCount ?? 0,
+          sku: values.sku?.trim() || null,
+          categoryId: values.categoryId || null,
+          sizes: values.sizes ?? [],
+          colours: cleanColours(values.colours),
+          materials: values.materials?.trim() || null,
+          careInstructions: values.careInstructions?.trim() || null,
+          isActive: values.isActive,
+          featured: values.featured,
+          unlimitedStock,
+          updatedAt: new Date(),
+        }).where(eq(products.id, productId));
+      }
+    });
+  } catch (error) {
+    // Return the reason instead of throwing: a thrown error only reaches the browser as React's
+    // hidden "Minified React error #441" in production.
+    const known = error instanceof Error && /size|SKU|reservation/i.test(error.message);
+    if (!known) console.error("updateProduct failed", error);
+    return { success: false, message: known ? (error as Error).message : "The product could not be saved. Please try again." };
+  }
+  revalidateTag("products", "max");
   revalidatePath("/");
   revalidatePath("/sitemap.xml");
   revalidatePath(`/product/${slug}`);
