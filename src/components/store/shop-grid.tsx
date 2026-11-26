@@ -176,7 +176,7 @@ export default function ShopGrid({
                 ? [
                     card,
                     <li key="feature" className="rise col-span-2 lg:order-none lg:col-span-4">
-                      <Link href={`/product/${feature.product.slug}`} className="card frame frame--dark group grid bg-ink text-white md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                      <Link href={`/product/${feature.product.slug}`} className="card group relative grid overflow-hidden bg-ink text-white md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                         <span className="relative block aspect-[9/16] max-h-[640px] w-full overflow-hidden md:aspect-auto md:h-[560px]">
                           <ReelVideo code={feature.code} label={feature.alt} width={720} />
                         </span>

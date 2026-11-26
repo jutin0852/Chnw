@@ -99,12 +99,12 @@ export default function ProductDetail({ product, number, film }: { product: Deta
           {media.map((item, i) => (
             <li
               key={item.kind === "film" ? "film" : `${item.image.id}-${i}`}
-              className={`frame w-[86vw] shrink-0 snap-center bg-mist sm:w-[60vw] lg:w-auto ${i === 0 ? "aspect-[4/5] lg:col-span-2" : "aspect-[4/5] lg:aspect-[9/16]"}`}
+              className={`relative w-[86vw] shrink-0 snap-center overflow-hidden bg-mist sm:w-[60vw] lg:w-auto ${i === 0 ? "aspect-[4/5] lg:col-span-2" : "aspect-[4/5] lg:aspect-[9/16]"}`}
             >
               {item.kind === "film" ? (
                 <>
                   <ReelVideo code={item.film.code} label={item.film.alt} />
-                  <span className="frame-tag label pointer-events-none absolute left-3 top-3 bg-paper px-2.5 py-1.5 text-[11px]">Film · in motion</span>
+                  <span className="label pointer-events-none absolute left-3 top-3 bg-paper px-2.5 py-1.5 text-[11px]">Film · in motion</span>
                 </>
               ) : (
                 <Image

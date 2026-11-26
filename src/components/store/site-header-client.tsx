@@ -174,7 +174,7 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
                   <Link href="/shop" className="label draw mt-5 inline-block py-1 text-[13px]">See all pieces</Link>
                 </li>
               </ul>
-              <div className="frame aspect-[4/3] max-h-[380px] self-start bg-mist">
+              <div className="relative aspect-[4/3] max-h-[380px] self-start overflow-hidden bg-mist">
                 {seen &&
                   categories.map((c, i) =>
                     c.image ? (

@@ -18,6 +18,7 @@ export default function ProductCard({
   priority = false,
   large = false,
   highPriority = false,
+  className = "",
 }: {
   product: StoreProduct;
   number?: string;
@@ -27,11 +28,13 @@ export default function ProductCard({
   large?: boolean;
   /** Only for the first one or two cards above the fold (LCP). */
   highPriority?: boolean;
+  /** Extra classes on the card (e.g. h-full when it must fill a grid cell). */
+  className?: string;
 }) {
   const [first, second] = product.images || [];
   const card = colourCard(product.productName, product.slug);
   return (
-    <Link href={`/product/${product.slug}`} className="card group flex min-w-0 flex-col gap-3">
+    <Link href={`/product/${product.slug}`} className={`card group flex min-w-0 flex-col gap-3 ${className}`}>
       <span className={`card-media block ${aspect}`}>
         <Image
           fill

@@ -53,17 +53,15 @@ function splitTween(el: HTMLElement, isIntro: boolean) {
 function blockTween(el: HTMLElement, paused: boolean) {
   const kind = el.dataset.reveal || "up";
   const delay = parseFloat(el.dataset.delay || "0");
-  // Rounded frames keep their corners while the clip animates.
-  const round = el.classList.contains("frame") ? " round var(--frame-radius)" : "";
   const from: gsap.TweenVars =
     kind === "fade"
       ? { autoAlpha: 0 }
       : kind === "clip"
-        ? { clipPath: `inset(100% 0% 0% 0%${round})`, autoAlpha: 1 }
+        ? { clipPath: "inset(100% 0% 0% 0%)", autoAlpha: 1 }
         : kind === "scale"
-          ? { scale: 1.12, clipPath: `inset(10% 10% 10% 10%${round})`, autoAlpha: 1 }
+          ? { scale: 1.12, clipPath: "inset(10% 10% 10% 10%)", autoAlpha: 1 }
           : { y: 40, autoAlpha: 0 };
-  const to: gsap.TweenVars = kind === "clip" || kind === "scale" ? { clipPath: `inset(0% 0% 0% 0%${round})`, scale: 1 } : {};
+  const to: gsap.TweenVars = kind === "clip" || kind === "scale" ? { clipPath: "inset(0% 0% 0% 0%)", scale: 1 } : {};
   gsap.set(el, { visibility: "visible" });
   return gsap.fromTo(el, from, {
     ...to,
