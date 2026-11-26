@@ -1,14 +1,16 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { removeHeroFilm, removeProductFilm, setHeroFilm, setProductFilm } from "../../app/actions/films";
+import { removeHeroFilm, removeProductFilm, removeReelFilm, setHeroFilm, setProductFilm, setReelFilm } from "../../app/actions/films";
 import { filmPoster, filmSrc } from "@/config/films";
 
 /** `uploaded` is false while the slot still shows its built-in film. */
 type Slot = { videoId: string | null; alt: string; uploaded: boolean };
 type HeroSlot = Slot & { position: number };
 type ProductSlot = Slot & { id: string; name: string; where: string };
+type ReelSlot = Slot & { position: number; productId: string };
+type ProductOption = { id: string; name: string };
 
 const HERO_LABELS = ["Left", "Centre (the only one shown on phones)", "Right"];
 const MAX_BYTES = 100 * 1024 * 1024;
@@ -47,6 +49,9 @@ function FilmCard({
   id,
   title,
   note,
+  extra,
+  extraDirty = false,
+  blockedReason,
   slot,
   onSave,
   onRemove,
@@ -55,6 +60,12 @@ function FilmCard({
   id: string;
   title: string;
   note?: string;
+  /** More fields under the description (the reel's product picker). */
+  extra?: ReactNode;
+  /** True when `extra` holds an unsaved change. */
+  extraDirty?: boolean;
+  /** Set when uploading is not possible yet, with the reason shown to the admin. */
+  blockedReason?: string;
   slot: Slot;
   onSave: (videoId: string, alt: string) => Promise<void>;
   onRemove: () => Promise<void>;
@@ -71,6 +82,10 @@ function FilmCard({
   async function pick(file: File | undefined) {
     if (!file) return;
     setError("");
+    if (blockedReason) {
+      if (input.current) input.current.value = "";
+      return setError(blockedReason);
+    }
     if (!file.type.startsWith("video/")) return setError("Choose a video file (MP4 or MOV).");
     if (file.size > MAX_BYTES) return setError("That file is over 100 MB. Trim or compress it first.");
     try {
@@ -112,6 +127,7 @@ function FilmCard({
           Describe the film (for screen readers)
           <input value={alt} onChange={(e) => setAlt(e.target.value)} maxLength={200} placeholder="A model in the crochet skirt walking" className="rounded-md border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-[var(--brand)]" />
         </label>
+        {extra}
         <div className="flex flex-wrap items-center gap-2">
           <input ref={input} type="file" accept="video/*" className="sr-only" id={id} onChange={(e) => void pick(e.target.files?.[0])} disabled={busy} />
           <label htmlFor={id} className={`inline-flex cursor-pointer items-center rounded-md bg-[var(--brand)] px-3 py-2 text-sm font-medium text-white hover:opacity-90 ${busy ? "pointer-events-none opacity-50" : ""}`}>
@@ -122,9 +138,9 @@ function FilmCard({
               Remove
             </button>
           )}
-          {slot.uploaded && slot.videoId && alt !== slot.alt && (
-            <button type="button" disabled={busy} onClick={() => startTransition(() => void onSave(slot.videoId as string, alt))} className="rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50">
-              Save description
+          {slot.videoId && ((slot.uploaded && alt !== slot.alt) || extraDirty) && (
+            <button type="button" disabled={busy} onClick={() => startTransition(() => void onSave(slot.videoId as string, alt).catch((e) => setError(e instanceof Error ? e.message : "Could not save.")))} className="rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50">
+              {extraDirty ? "Save changes" : "Save description"}
             </button>
           )}
         </div>
@@ -139,7 +155,52 @@ function FilmCard({
   );
 }
 
-export function FilmsManager({ hero, productFilms }: { hero: HeroSlot[]; productFilms: ProductSlot[] }) {
+function ReelCard({ slot, products, onDone }: { slot: ReelSlot; products: ProductOption[]; onDone: () => void }) {
+  const [productId, setProductId] = useState(slot.productId);
+  return (
+    <FilmCard
+      id={`reel-film-${slot.position}`}
+      title={`Reel ${slot.position + 1}`}
+      note="Links to the piece below (“Shop the look”)."
+      slot={slot}
+      extraDirty={productId !== slot.productId}
+      blockedReason={productId ? undefined : "Choose the piece this film shows first."}
+      extra={
+        <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+          Piece shown in the film
+          <select value={productId} onChange={(e) => setProductId(e.target.value)} className="rounded-md border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-[var(--brand)]">
+            <option value="">Choose a piece…</option>
+            {products.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </label>
+      }
+      onSave={async (videoId, alt) => {
+        if (!productId) throw new Error("Choose the piece this film shows first.");
+        await setReelFilm(slot.position, videoId, alt, productId);
+        onDone();
+      }}
+      onRemove={async () => {
+        await removeReelFilm(slot.position);
+        onDone();
+      }}
+      removeLabel="Remove this film? The slot goes back to its original film and piece."
+    />
+  );
+}
+
+export function FilmsManager({
+  hero,
+  productFilms,
+  reels,
+  productOptions,
+}: {
+  hero: HeroSlot[];
+  productFilms: ProductSlot[];
+  reels: ReelSlot[];
+  productOptions: ProductOption[];
+}) {
   const router = useRouter();
   const done = () => router.refresh();
 
@@ -167,6 +228,18 @@ export function FilmsManager({ hero, productFilms }: { hero: HeroSlot[]; product
               }}
               removeLabel="Remove this film? The slot goes back to its original film."
             />
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">Worn by you, filmed by us</h2>
+          <p className="text-sm text-muted-foreground">Four reels in a row on the home page. Each one links to the piece it shows. Choose the piece, then upload the film.</p>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-2">
+          {reels.map((slot) => (
+            <ReelCard key={`${slot.position}-${slot.videoId}-${slot.productId}`} slot={slot} products={productOptions} onDone={done} />
           ))}
         </div>
       </div>

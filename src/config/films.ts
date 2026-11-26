@@ -33,6 +33,19 @@ export const heroFilms: Film[] = [
 ];
 
 /**
+ * "Worn by you, filmed by us" reels strip on the home page: four films, each linked to the piece it
+ * shows. These are the built-in films; each slot can be replaced in /admin/films.
+ */
+export type ReelFilm = Film & { slug: string; label: string };
+export const REEL_SLOTS = 4;
+export const reelFilms: ReelFilm[] = [
+  { code: "DRXMN9Rihls", slug: "the-triangle-tote", label: "The Triangle Tote", alt: "The Triangle Tote carried over the shoulder" },
+  { code: "DQrg4vbimiq", slug: "the-crochet-denim-skirt", label: "The Crochet Denim Skirt", alt: "Close-up of the Crochet Denim Skirt's drawstring waist" },
+  { code: "DU5M1gUCvvF", slug: "the-asymmetric-denim-skirt", label: "The Asymmetric Denim Skirt", alt: "The Asymmetric Denim Skirt moving as the model turns" },
+  { code: "DTmyNfXCoST", slug: "the-gigi-pants", label: "The Gigi Pants", alt: "The Gigi Pants worn with sandals" },
+];
+
+/**
  * The only product films on the store. Each one can be replaced in /admin/films.
  * - The Crochet Denim Skirt film plays in the home page's "fabric vs what we make" section and on the skirt's page.
  * - The Gigi Pants film is the featured film on the shop page and plays on the pants' page.

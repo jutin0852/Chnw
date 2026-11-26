@@ -347,8 +347,19 @@ html:not(.js) #loader, html.loader-seen #loader, html.is-loaded #loader, #loader
 .pill:disabled { opacity: 0.4; cursor: not-allowed; }
 .pill:disabled::before { display: none; }
 
+/*
+ * Frame: every photo and film box on the storefront (cards, galleries, reels) has the same rounded
+ * corner and hairline border. Full-bleed bands (the hero) stay square. Change --frame-radius to
+ * restyle them all at once. isolation keeps Safari from drawing square video corners.
+ */
+:root { --frame-radius: 16px; }
+.frame { position: relative; overflow: hidden; border-radius: var(--frame-radius); border: 1px solid var(--line); isolation: isolate; }
+.frame--dark { border-color: rgb(255 255 255 / 0.14); }
+/* Small labels laid over a frame (Film, Finished) are rounded to match. */
+.frame-tag { border-radius: 999px; }
+
 /* Product card: photo settles from a slight zoom, second photo crossfades in on hover. */
-.card-media { position: relative; overflow: hidden; background: var(--mist); }
+.card-media { position: relative; overflow: hidden; background: var(--mist); border-radius: var(--frame-radius); border: 1px solid var(--line); isolation: isolate; }
 .card-media img { transition: transform 1.2s var(--ease-cloth, ease), opacity 0.6s ease; }
 .card:hover .card-media img:first-child { transform: scale(1.04); }
 .card-media .card-alt { opacity: 0; }

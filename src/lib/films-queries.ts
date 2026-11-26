@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { products, siteFilms } from "@/lib/schema";
-import { featuredFilms, heroFilms as defaultHero, type Film } from "@/config/films";
+import { featuredFilms, heroFilms as defaultHero, reelFilms, REEL_SLOTS, type Film, type ReelFilm } from "@/config/films";
 
 // Films managed in /admin/films. Falls back to the built-in films when the table is missing or
 // empty, so the storefront never shows a hole. Cached briefly; saving in the admin revalidates it.
@@ -45,4 +45,14 @@ export async function getProductFilms(): Promise<Record<string, Film>> {
       return [slug, row ? { code: row.videoId, alt: row.alt || film.alt } : film];
     }),
   );
+}
+
+/** The four "Worn by you, filmed by us" reels, in order. An empty slot falls back to its built-in film. */
+export async function getReelFilms(): Promise<ReelFilm[]> {
+  const rows = (await load()).filter((r) => r.placement === "reel" && r.slug);
+  return Array.from({ length: REEL_SLOTS }, (_, i) => {
+    const row = rows.find((r) => r.position === i);
+    if (!row) return reelFilms[i];
+    return { code: row.videoId, alt: row.alt || `${row.name} being worn`, slug: row.slug as string, label: row.name || "" };
+  });
 }

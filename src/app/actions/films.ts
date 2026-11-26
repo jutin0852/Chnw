@@ -3,7 +3,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { products, siteFilms } from "@/lib/schema";
-import { FEATURED_FILM_SLUGS } from "@/config/films";
+import { FEATURED_FILM_SLUGS, reelFilms, REEL_SLOTS } from "@/config/films";
 import { requireAdmin } from "@/lib/admin-auth";
 
 // Only Cloudinary public ids from our own folders are accepted.
@@ -52,5 +52,27 @@ export async function setProductFilm(productId: string, videoId: string, alt: st
 export async function removeProductFilm(productId: string) {
   await requireAdmin();
   await db.delete(siteFilms).where(and(eq(siteFilms.placement, "product"), eq(siteFilms.productId, productId)));
+  refresh();
+}
+
+/**
+ * A "Worn by you, filmed by us" reel: a film plus the product it links to. The video is either a
+ * fresh upload or the slot's built-in film (when only the product or description changes).
+ */
+export async function setReelFilm(position: number, videoId: string, alt: string, productId: string) {
+  await requireAdmin();
+  if (!Number.isInteger(position) || position < 0 || position >= REEL_SLOTS) throw new Error("Pick one of the reel slots.");
+  if (!VIDEO_ID.test(videoId) && videoId !== reelFilms[position]?.code) throw new Error("That video could not be used.");
+  const [product] = await db.select({ id: products.id }).from(products).where(eq(products.id, productId)).limit(1);
+  if (!product) throw new Error("Choose the piece this film shows.");
+  const altText = alt.trim().slice(0, 200) || null;
+  await db.delete(siteFilms).where(and(eq(siteFilms.placement, "reel"), eq(siteFilms.position, position)));
+  await db.insert(siteFilms).values({ placement: "reel", position, productId, videoId, alt: altText });
+  refresh();
+}
+
+export async function removeReelFilm(position: number) {
+  await requireAdmin();
+  await db.delete(siteFilms).where(and(eq(siteFilms.placement, "reel"), eq(siteFilms.position, position)));
   refresh();
 }

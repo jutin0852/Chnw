@@ -8,16 +8,16 @@ import HomeLoader from "../components/store/home-loader";
 import HeroFilms from "../components/store/hero-films";
 import ReelVideo from "../components/store/reel-video";
 import ProductCard from "../components/store/product-card";
-import { cloudinaryThumb, pieceNumbers } from "../components/store/catalog";
+import { cloudinaryThumb, pieceNumbers, shortName } from "../components/store/catalog";
 import { formatStorePrice } from "../components/store/currency";
-import { getHeroFilms, getProductFilms } from "@/lib/films-queries";
+import { getHeroFilms, getProductFilms, getReelFilms } from "@/lib/films-queries";
 
 export const dynamic = "force-dynamic";
 
 const NEW_IN = ["the-triangle-tote", "the-crochet-denim-skirt", "the-gigi-pants-polka-dot", "the-soni-dress", "the-asymmetric-denim-skirt"];
 
 export default async function Home() {
-  const [everything, heroFilms, productFilms] = await Promise.all([getAllProducts(), getHeroFilms(), getProductFilms()]);
+  const [everything, heroFilms, productFilms, reelFilms] = await Promise.all([getAllProducts(), getHeroFilms(), getProductFilms(), getReelFilms()]);
   const numbers = pieceNumbers(everything);
   const bySlug = new Map(everything.map((p) => [p.slug, p]));
   const products = collapseColourways(everything);
@@ -103,18 +103,45 @@ export default async function Home() {
                 )}
               </div>
               <div className="grid grid-cols-2 gap-3 sm:gap-5">
-                <figure className="relative aspect-[9/16] overflow-hidden bg-ink" data-reveal="clip">
+                <figure className="frame aspect-[9/16] bg-ink" data-reveal="clip">
                   <ReelVideo code={fabricFilm.code} label={fabricFilm.alt} />
-                  <figcaption className="label absolute left-3 top-3 bg-paper px-2.5 py-1.5 text-[11px]">Film</figcaption>
+                  <figcaption className="frame-tag label absolute left-3 top-3 bg-paper px-2.5 py-1.5 text-[11px]">Film</figcaption>
                 </figure>
                 {crochet?.images[0] && (
-                  <figure className="relative mt-16 aspect-[9/16] overflow-hidden bg-paper sm:mt-24" data-reveal="clip" data-delay="0.12">
+                  <figure className="frame mt-16 aspect-[9/16] bg-paper sm:mt-24" data-reveal="clip" data-delay="0.12">
                     <Image src={crochet.images[0].imageUrl} alt={crochet.images[0].altText || "The finished Crochet Denim Skirt"} fill sizes="(max-width: 1023px) 50vw, 30vw" className="object-cover" />
-                    <figcaption className="label absolute left-3 top-3 bg-thread px-2.5 py-1.5 text-[11px] text-white">Finished</figcaption>
+                    <figcaption className="frame-tag label absolute left-3 top-3 bg-thread px-2.5 py-1.5 text-[11px] text-white">Finished</figcaption>
                   </figure>
                 )}
               </div>
             </div>
+          </section>
+
+          {/* ── Reels: worn by you ─────────────────────────── */}
+          <section aria-labelledby="reels-title" className="py-20 lg:py-28">
+            <div className="mx-auto mb-8 flex max-w-[1500px] flex-wrap items-baseline justify-between gap-4 px-4 sm:px-8 lg:px-12">
+              <h2 id="reels-title" data-split="lines" className="font-display text-[40px] leading-none sm:text-[56px]">Worn by you, filmed by us</h2>
+              <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noopener noreferrer" className="label draw py-1 text-[13px]">@chnw.ng on Instagram</a>
+            </div>
+            <ul className="mx-auto flex max-w-[1500px] snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:px-8 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-12 [&::-webkit-scrollbar]:hidden">
+              {reelFilms.map((film, i) => {
+                const product = bySlug.get(film.slug);
+                return (
+                  <li key={`${i}-${film.code}`} className="w-[68vw] shrink-0 snap-start sm:w-[40vw] lg:w-auto" data-reveal="up" data-delay={String(i * 0.06)}>
+                    <Link href={product ? `/product/${film.slug}` : "/shop"} className="card frame frame--dark group block aspect-[9/16] bg-ink text-white">
+                      <ReelVideo code={film.code} label={film.alt} className="transition-transform duration-[1.2s] ease-cloth group-hover:scale-[1.03]" />
+                      <span className="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-[linear-gradient(180deg,rgba(20,18,16,0)_0%,rgba(20,18,16,0.78)_100%)] p-4 pt-16">
+                        <span className="label text-[11px] text-white/75">Shop the look</span>
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span className="font-display text-[22px] leading-tight">{shortName(product?.productName || film.label)}</span>
+                          {product && <span className="label text-[12px] tracking-[0.04em]">{formatStorePrice(product.price)}</span>}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </section>
 
           {/* ── The Workroom ───────────────────────────────── */}

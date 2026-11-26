@@ -149,12 +149,14 @@ Screenshot:  Three reels side by side with the white Bodoni CHNW across them.
 ### System
 - Palette: paper #FFFFFF (ground), ink #141210 (text, dark bands), thread red #A40009 (accent, CTAs, wipes), mist #F3F1EE (banded sections), stone #5E574F (muted text).
 - Type: Bodoni Moda (display, wordmark), Instrument Sans (reading), Courier Prime (labels, prices, nav, after Deadly Ponies). All via next/font/google.
-- Shape: pills for actions, square everything else. Dashed red "stitch" rule as the divider and checkout progress.
+- Shape: pills for actions. Every photo and film box (product cards, galleries, reels, the fabric section, the shop feature, the menu photo) is a rounded frame with a hairline border: the `.frame` class (or `.card-media` on product cards), radius set once by `--frame-radius` in `globals.css`. Labels laid on a frame use `.frame-tag`. Full-bleed bands such as the hero stay square. Use `.frame` for any new photo or film box. Dashed red "stitch" rule as the divider and checkout progress.
 - Motion: GSAP + Lenis on one clock (`src/engine`), SplitText headline reveals, clip reveals on media, red curtain between storefront pages (`src/engine/transition.ts`). Admin, checkout and account keep native scroll and plain navigation. Everything switches off under reduced motion; hero films start paused and every film can be paused.
-- Films: Instagram reels on Cloudinary (`chnw/video/<post code>`), mapped in `src/config/films.ts`. Reels play only while on screen.
+- Films: Instagram reels on Cloudinary (`chnw/video/<post code>`), mapped in `src/config/films.ts`, replaceable in /admin/films. Reels play only while on screen.
 
 ### Decisions
 - 2026-11-10: Reels are 720×1280, so the desktop hero shows three side by side at native sharpness instead of stretching one (after Balmoral's full-screen film, adapted). Phones show the middle reel alone.
 - 2026-11-10: Page background is pure white (owner's choice over linen).
+- 2026-11-26: Photo and film boxes move from square to rounded 16px frames with a hairline border, on every storefront page (owner's choice, for consistency).
+- 2026-11-26: The "Worn by you, filmed by us" reels are managed in /admin/films: four slots, each a film and the piece it links to.
 - 2026-11-10: Product size picker uses CHNW's UK 4 to 20 chart (replaces the template's S/M/L/XL table). No size is preselected.
 - 2026-11-10: New `/shop` page holds the filterable grid; home is editorial. Header links use `?category=`.
