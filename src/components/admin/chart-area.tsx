@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, Bar, CartesianGrid, ComposedChart, XAxis, YAxis } from "recharts";
+import { Area, CartesianGrid, ComposedChart, XAxis, YAxis } from "recharts";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -96,7 +96,6 @@ export function ChartAreaInteractive({ data = [] }: { data?: DayPoint[] }) {
     (sum, point) => ({ orders: sum.orders + point.orders, revenue: sum.revenue + point.revenue }),
     { orders: 0, revenue: 0 },
   );
-  const maxOrders = Math.max(1, ...series.map((point) => point.orders));
 
   return (
     <Card className="@container/card rounded-lg border-black/15 bg-white shadow-none">
@@ -138,10 +137,9 @@ export function ChartAreaInteractive({ data = [] }: { data?: DayPoint[] }) {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <div className="mb-2 flex items-center gap-4 px-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5"><span className="inline-block size-2.5" style={{ background: chartConfig.revenue.color }} />Revenue (₦)</span>
-          <span className="inline-flex items-center gap-1.5"><span className="inline-block size-2.5" style={{ background: chartConfig.orders.color }} />Orders</span>
         </div>
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-          <ComposedChart data={series} margin={{ left: 0, right: 0 }}>
+          <ComposedChart data={series} margin={{ left: 0, right: 12 }}>
             <defs>
               <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--color-revenue)" stopOpacity={0.55} />
@@ -165,16 +163,6 @@ export function ChartAreaInteractive({ data = [] }: { data?: DayPoint[] }) {
               tickMargin={4}
               tickFormatter={compactNaira}
               domain={[0, (max: number) => Math.max(max, 50000)]}
-            />
-            <YAxis
-              yAxisId="orders"
-              orientation="right"
-              tickLine={false}
-              axisLine={false}
-              width={28}
-              tickMargin={4}
-              allowDecimals={false}
-              domain={[0, Math.max(maxOrders, 3)]}
             />
             <ChartTooltip
               cursor={false}
@@ -200,7 +188,6 @@ export function ChartAreaInteractive({ data = [] }: { data?: DayPoint[] }) {
               strokeWidth={2}
               dot={false}
             />
-            <Bar yAxisId="orders" dataKey="orders" fill="var(--color-orders)" radius={[2, 2, 0, 0]} maxBarSize={14} />
           </ComposedChart>
         </ChartContainer>
         {totals.orders === 0 && (
