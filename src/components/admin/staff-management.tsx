@@ -1,4 +1,5 @@
 "use client";
+import { notify, reason } from "@/lib/admin-toast";
 import { useState, useTransition } from "react";
 import { addStaffDirectly, inviteStaff, removeStaff, revokeInvitation } from "@/app/actions/staff";
 
@@ -38,11 +39,13 @@ export function StaffManagement({ members, invitations, emailReady }: { members:
       try {
         const result = await addStaffDirectly({ name, email, password });
         setAdded({ email: email.trim().toLowerCase(), password: result.created ? password : null });
+        notify.done("Staff member added", `${email.trim().toLowerCase()} can now open the admin.`);
         setName("");
         setEmail("");
         setPassword(makeTempPassword());
       } catch (error) {
-        setAddError(error instanceof Error ? error.message : "Could not add them.");
+        setAddError(reason(error, "Could not add them."));
+        notify.failed("Staff member not added", reason(error));
       }
     });
   }
@@ -53,7 +56,8 @@ export function StaffManagement({ members, invitations, emailReady }: { members:
       try {
         await inviteStaff(inviteEmail);
         setInviteEmail("");
-        setInviteMessage("Invitation sent.");
+        setInviteMessage("");
+        notify.done("Invitation sent", inviteEmail);
       } catch (error) {
         setInviteMessage(error instanceof Error ? error.message : "Could not send invitation.");
       }
@@ -147,6 +151,7 @@ export function StaffManagement({ members, invitations, emailReady }: { members:
                       startTransition(async () => {
                         try {
                           await removeStaff(member.id);
+                          notify.done("Staff access removed", member.email);
                         } catch (error) {
                           setTeamError(error instanceof Error ? error.message : "Could not remove them.");
                         }
@@ -174,7 +179,7 @@ export function StaffManagement({ members, invitations, emailReady }: { members:
                 <p className="text-sm text-muted-foreground">{inv.acceptedAt ? "Accepted" : inv.revokedAt ? "Revoked" : `Expires ${inv.expiresAt.toLocaleDateString()}`}</p>
               </div>
               {!inv.acceptedAt && !inv.revokedAt && (
-                <button onClick={() => startTransition(async () => { await revokeInvitation(inv.id); })} className="text-sm underline">Revoke</button>
+                <button onClick={() => startTransition(async () => { await revokeInvitation(inv.id); notify.done("Invitation revoked", inv.email); })} className="text-sm underline">Revoke</button>
               )}
             </div>
           ))}

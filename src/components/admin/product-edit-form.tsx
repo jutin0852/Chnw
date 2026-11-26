@@ -1,4 +1,5 @@
 "use client";
+import { notify, reason } from "@/lib/admin-toast";
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
@@ -64,7 +65,18 @@ export function ProductEditForm({
         featured,
         unlimitedStock,
         variants,
-      }).then((result) => setMessage(result.success ? "Product saved." : result.message || "Could not save product.")).catch((error: unknown) => setMessage(error instanceof Error ? error.message : "Could not save product."));
+      }).then((result) => {
+        if (result.success) {
+          setMessage("");
+          notify.done("Product saved", `${name.trim()} is up to date in the shop.`);
+        } else {
+          setMessage(result.message || "Could not save product.");
+          notify.failed("Product not saved", result.message || undefined);
+        }
+      }).catch((error: unknown) => {
+        setMessage(reason(error, "Could not save product."));
+        notify.failed("Product not saved", reason(error));
+      });
     });
   }
 

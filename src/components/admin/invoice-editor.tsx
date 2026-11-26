@@ -1,4 +1,5 @@
 "use client";
+import { notify } from "@/lib/admin-toast";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -114,7 +115,11 @@ export function InvoiceEditor({ invoiceId, number, initial }: { invoiceId?: stri
     const input = { customerName, customerPhone, customerEmail, invoiceDate, notes, sections: filled };
     startTransition(async () => {
       const result = invoiceId ? await updateInvoice(invoiceId, input) : await createInvoice(input);
-      if (!result.success) return setError(result.message);
+      if (!result.success) {
+        notify.failed("Invoice not saved", result.message || undefined);
+        return setError(result.message);
+      }
+      notify.done(invoiceId ? "Invoice updated" : "Invoice created", customerName.trim() || undefined);
       router.push(`/admin/invoices/${invoiceId ?? result.id}`);
       router.refresh();
     });

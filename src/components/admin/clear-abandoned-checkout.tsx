@@ -1,4 +1,5 @@
 "use client";
+import { notify } from "@/lib/admin-toast";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -14,6 +15,7 @@ export function ClearAbandonedCheckout({ orderId }: { orderId: string }) {
     startTransition(() => {
       void clearAbandonedCheckout(orderId).then((result) => {
         if (result.success) {
+          notify.done("Unpaid checkout removed");
           router.push("/admin/orders");
           router.refresh();
         }
