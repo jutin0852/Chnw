@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { User } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { startScroll, stopScroll } from "@/engine";
 import { useCart } from "./cart-context";
 import CartDrawer from "./cart-drawer";
 import { primaryProductImage } from "./brand-assets";
+import SearchPanel, { type SearchItem } from "./search-panel";
 
 export type NavCategory = { slug: string; name: string; count: number; image?: string };
 
@@ -28,10 +29,11 @@ const menu = [
   { href: "/#workroom", label: "The Workroom" },
 ];
 
-export default function SiteHeaderClient({ overlay = false, categories = [] }: { overlay?: boolean; categories?: NavCategory[] }) {
+export default function SiteHeaderClient({ overlay = false, categories = [], searchItems = [] }: { overlay?: boolean; categories?: NavCategory[]; searchItems?: SearchItem[] }) {
   const pathname = usePathname();
   const { cartCount, bagOpen, setBagOpen } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [seen, setSeen] = useState(false);
   const [active, setActive] = useState(0);
@@ -42,6 +44,7 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
   if (openedOn !== pathname) {
     setOpenedOn(pathname);
     setCollectionOpen(false);
+    setSearchOpen(false);
   }
   useEffect(() => {
     if (!collectionOpen) return;
@@ -58,9 +61,9 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
   }, [collectionOpen]);
 
   useEffect(() => {
-    if (menuOpen || bagOpen) stopScroll();
+    if (menuOpen || bagOpen || searchOpen) stopScroll();
     else startScroll();
-  }, [menuOpen, bagOpen]);
+  }, [menuOpen, bagOpen, searchOpen]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -69,6 +72,7 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
     return () => removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
   const tone = overlay ? "text-white" : "text-ink";
 
   return (
@@ -130,7 +134,23 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
           </Link>
 
           <div className="flex items-center justify-end gap-x-1 lg:gap-x-5">
-            <Link href="/shop#search" className="label draw hidden py-1 text-[13px] lg:inline">Search</Link>
+            <button
+              type="button"
+              onClick={() => {
+                setCollectionOpen(false);
+                setSearchOpen(true);
+              }}
+              aria-haspopup="dialog"
+              aria-expanded={searchOpen}
+              aria-label="Search"
+              className="label draw grid h-11 w-11 place-items-center lg:h-auto lg:w-auto lg:py-1 lg:text-[13px]"
+            >
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="lg:hidden">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <span className="hidden lg:inline">Search</span>
+            </button>
             <Link
               href="/account"
               aria-label="Account"
@@ -228,6 +248,8 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
           <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noopener noreferrer" className="label py-2 text-[12px]">@chnw.ng</a>
         </div>
       </div>
+
+      <SearchPanel open={searchOpen} onClose={closeSearch} items={searchItems} categories={categories} />
 
       <CartDrawer
         open={bagOpen}

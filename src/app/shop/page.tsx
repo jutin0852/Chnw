@@ -26,8 +26,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   };
 }
 
-export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
-  const [{ category }, products, productFilm] = await Promise.all([searchParams, getAllProducts(), getProductFilms()]);
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string; q?: string }> }) {
+  const [{ category, q }, products, productFilm] = await Promise.all([searchParams, getAllProducts(), getProductFilms()]);
   const numbers = Object.fromEntries(pieceNumbers(products));
   const known = new Set(products.map((p) => p.category?.slug));
   const featured = products.find((p) => p.slug === "the-gigi-pants");
@@ -37,7 +37,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
     <>
       <SiteHeader />
       <main id="main" tabIndex={-1} className="min-h-screen bg-paper text-ink outline-none">
-        <ShopGrid key={category || "all"} products={collapseColourways(products)} numbers={numbers} initialCategory={category && known.has(category) ? category : "all"} feature={feature} />
+        <ShopGrid key={`${category || "all"}|${q || ""}`} initialQuery={(q || "").slice(0, 80)} products={collapseColourways(products)} numbers={numbers} initialCategory={category && known.has(category) ? category : "all"} feature={feature} />
       </main>
       <SiteFooter />
     </>
