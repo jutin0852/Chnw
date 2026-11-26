@@ -114,7 +114,6 @@ export default async function Home() {
                 {crochet?.images[0] && (
                   <figure className="relative mt-16 aspect-[9/16] overflow-hidden bg-paper sm:mt-24" data-reveal="clip" data-delay="0.12">
                     <Image src={crochet.images[0].imageUrl} alt={crochet.images[0].altText || "The finished Crochet Denim Skirt"} fill sizes="(max-width: 1023px) 50vw, 30vw" className="object-cover" />
-                    <figcaption className="label absolute left-3 top-3 bg-thread px-2.5 py-1.5 text-[11px] text-white">Finished</figcaption>
                   </figure>
                 )}
               </div>
