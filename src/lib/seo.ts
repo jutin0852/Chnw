@@ -83,8 +83,8 @@ export function productJsonLd(product: SeoProduct) {
         shippingDestination: { "@type": "DefinedRegion", addressCountry: "NG" },
         deliveryTime: {
           "@type": "ShippingDeliveryTime",
-          // Pieces are made after the order: 5 to 7 working days to make, then delivery.
-          handlingTime: { "@type": "QuantitativeValue", minValue: 5, maxValue: 7, unitCode: "DAY" },
+          // Pieces are made after the order: 7 to 10 working days to make, then delivery.
+          handlingTime: { "@type": "QuantitativeValue", minValue: 7, maxValue: 10, unitCode: "DAY" },
           transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 5, unitCode: "DAY" },
         },
       },

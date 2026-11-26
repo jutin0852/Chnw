@@ -98,7 +98,7 @@ export default async function Home() {
                   From a bolt of crochet denim to the skirt you wear.
                 </h2>
                 <p className="max-w-[440px] text-[17px] leading-[1.6] text-[#3d3832]">
-                  Each skirt is cut and crocheted once you order it, so no two come out quite the same. Watch one come together, then choose your UK size.
+                  Each skirt is cut and crocheted once you order it, so no two come out quite the same. Watch one come together, then choose your size.
                 </p>
                 {crochet && (
                   <Link href={`/product/${crochet.slug}`} className="pill pill--ink">
@@ -160,8 +160,8 @@ export default async function Home() {
               </div>
               <ol className="flex flex-col">
                 {[
-                  ["You order in your UK size.", "Our chart runs from UK 4 to 20, with bust, waist and hip measurements for each size."],
-                  ["We cut and make it by hand.", "Production and delivery take 5 to 7 business days. Upcycled pieces can differ slightly from the photos."],
+                  ["You order in your size.", "Our chart runs from UK 4 to 20, with bust, waist and hip measurements for each size."],
+                  ["We cut and make it by hand.", "Production and delivery take 7 to 10 business days. Upcycled pieces can differ slightly from the photos."],
                   ["Not quite right? We adjust it.", "Send it back within 30 days for an adjustment or a remake. We do adjustments instead of refunds."],
                 ].map(([title, body], i) => (
                   <li key={title} data-reveal="up" data-delay={String(i * 0.08)} className="grid grid-cols-[48px_1fr] gap-4 border-b border-white/15 py-7 first:pt-0">

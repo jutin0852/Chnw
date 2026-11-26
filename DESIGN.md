@@ -55,7 +55,7 @@ Older posts from 2024–early 2025, possibly discontinued: denim Grande / Jumbo 
 - Items can come back for adjustment within 30 days. Sale and customised items are final.
 - If a problem comes from measurements the customer gave, the customer pays delivery for the adjustment. Items must come back in good condition.
 - Upcycled pieces can differ slightly from the samples shown.
-- Production and delivery take 5–7 business days.
+- Production and delivery take 7–10 business days.
 
 ### Size chart (UK, from the Size chart highlight, inches)
 
@@ -85,7 +85,7 @@ The unit isn't printed on the chart. These numbers match inches.
 - [ ] Brand colours — #A40009 sampled from the logo; confirm the exact value
 - [ ] Typeface name for the serif wordmark and graphics
 - [ ] Product list: current prices above are from captions; confirm sizes, stock, photos, and which older pieces are still sold
-- [ ] Delivery areas and costs (timing: 5–7 business days per Policies)
+- [ ] Delivery areas and costs (timing: 7–10 business days per Policies)
 - [ ] Contact details for invoices: address, phone, WhatsApp, email
 - [ ] Domain the store launches on (`chnw.ng` is not registered or has no DNS yet)
 

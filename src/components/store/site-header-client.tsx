@@ -83,8 +83,8 @@ export default function SiteHeaderClient({ overlay = false, categories = [] }: {
       >
         {overlay && (
           <p className="label border-b border-white/20 px-4 py-2.5 text-center text-[11px] sm:text-xs">
-            <span className="sm:hidden">Made to order · 5 to 7 business days</span>
-            <span className="hidden sm:inline">Handmade · made to order · ready in 5 to 7 business days</span>
+            <span className="sm:hidden">Made to order · 7 to 10 business days</span>
+            <span className="hidden sm:inline">Handmade · made to order · ready in 7 to 10 business days</span>
           </p>
         )}
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-2 py-2 sm:px-6 lg:px-10 lg:py-4">

@@ -23,7 +23,9 @@ export async function POST() {
   }
 
   const timestamp = Math.round(Date.now() / 1000);
-  const transformation = "c_limit,w_1600,q_82";
+  // Stored copy: up to 2560px at high quality (the phone upload is already resized). Shoppers get
+  // smaller AVIF/WebP versions made from it per screen, so this does not slow pages down.
+  const transformation = "c_limit,w_2560,q_auto:best";
   const signature = cloudinary.utils.api_sign_request(
     {
       timestamp,
