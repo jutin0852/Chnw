@@ -1,17 +1,22 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { clearAbandonedCheckout } from "@/app/actions/updateOrder";
 
 export function ClearAbandonedCheckout({ orderId }: { orderId: string }) {
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   function clear() {
     if (!window.confirm("Remove this unpaid checkout record? This permanently removes the order and its line items.")) return;
     startTransition(() => {
       void clearAbandonedCheckout(orderId).then((result) => {
-        if (result.success) window.location.assign("/admin/orders");
+        if (result.success) {
+          router.push("/admin/orders");
+          router.refresh();
+        }
         else setMessage(result.message || "Could not remove this checkout record.");
       });
     });
