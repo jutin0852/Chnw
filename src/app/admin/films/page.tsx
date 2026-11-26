@@ -24,7 +24,7 @@ export default async function FilmsPage() {
     const row = rows.find((r) => r.placement === "product" && r.productId === product.id);
     return [{ id: product.id, name: label, where, videoId: row?.videoId ?? film.code, alt: row?.alt ?? film.alt, uploaded: Boolean(row) }];
   });
-  // "Worn by you, filmed by us": four slots, each a film plus the piece it links to.
+  // "Captured moments": four slots, each a film plus the piece it links to.
   const reels = reelFilms.map((film, position) => {
     const row = rows.find((r) => r.placement === "reel" && r.position === position);
     const productId = row?.productId ?? productRows.find((p) => p.slug === film.slug)?.id ?? "";
@@ -35,7 +35,7 @@ export default async function FilmsPage() {
     <section className="@container/main flex flex-1 flex-col gap-6 px-4 py-6 lg:px-6">
       <div>
         <h1 className="text-xl font-semibold">Films</h1>
-        <p className="text-sm text-muted-foreground">Choose the films shown in the home page hero, the crochet skirt section, the “Worn by you, filmed by us” reels, and the featured film on the shop page. Upload a short vertical clip (MP4 or MOV, up to 100 MB). Films are shrunk automatically when you upload them (1080 pixels wide, no sound). Upload the original camera file, not one saved from Instagram or WhatsApp, for the sharpest result. They appear on the store within a minute.</p>
+        <p className="text-sm text-muted-foreground">Choose the films shown in the home page hero, the crochet skirt section, the “Captured moments” reels, and the featured film on the shop page. Upload a short vertical clip (MP4 or MOV, up to 100 MB). Films are shrunk automatically when you upload them (1080 pixels wide, no sound). Upload the original camera file, not one saved from Instagram or WhatsApp, for the sharpest result. They appear on the store within a minute.</p>
       </div>
       <FilmsManager hero={hero} productFilms={productFilms} reels={reels} productOptions={productOptions} />
     </section>

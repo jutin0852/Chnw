@@ -56,7 +56,7 @@ export async function removeProductFilm(productId: string) {
 }
 
 /**
- * A "Worn by you, filmed by us" reel: a film plus the product it links to. The video is either a
+ * A "Captured moments" reel: a film plus the product it links to. The video is either a
  * fresh upload or the slot's built-in film (when only the product or description changes).
  */
 export async function setReelFilm(position: number, videoId: string, alt: string, productId: string) {

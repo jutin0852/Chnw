@@ -33,7 +33,7 @@ export const heroFilms: Film[] = [
 ];
 
 /**
- * "Worn by you, filmed by us" reels strip on the home page: four films, each linked to the piece it
+ * "Captured moments" reels strip on the home page: four films, each linked to the piece it
  * shows. These are the built-in films; each slot can be replaced in /admin/films.
  */
 export type ReelFilm = Film & { slug: string; label: string };

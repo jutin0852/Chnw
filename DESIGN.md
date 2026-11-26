@@ -158,6 +158,6 @@ Screenshot:  Three reels side by side with the white Bodoni CHNW across them.
 - 2026-11-10: Reels are 720×1280, so the desktop hero shows three side by side at native sharpness instead of stretching one (after Balmoral's full-screen film, adapted). Phones show the middle reel alone.
 - 2026-11-10: Page background is pure white (owner's choice over linen).
 - 2026-11-26: Admin boxes, tables and inputs made consistently rounded (owner's choice); the storefront stays square.
-- 2026-11-26: The "Worn by you, filmed by us" reels are managed in /admin/films: four slots, each a film and the piece it links to.
+- 2026-11-26: The "Captured moments" reels are managed in /admin/films: four slots, each a film and the piece it links to.
 - 2026-11-10: Product size picker uses CHNW's UK 4 to 20 chart (replaces the template's S/M/L/XL table). No size is preselected.
 - 2026-11-10: New `/shop` page holds the filterable grid; home is editorial. Header links use `?category=`.

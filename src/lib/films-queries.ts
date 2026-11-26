@@ -47,7 +47,7 @@ export async function getProductFilms(): Promise<Record<string, Film>> {
   );
 }
 
-/** The four "Worn by you, filmed by us" reels, in order. An empty slot falls back to its built-in film. */
+/** The four "Captured moments" reels, in order. An empty slot falls back to its built-in film. */
 export async function getReelFilms(): Promise<ReelFilm[]> {
   const rows = (await load()).filter((r) => r.placement === "reel" && r.slug);
   return Array.from({ length: REEL_SLOTS }, (_, i) => {

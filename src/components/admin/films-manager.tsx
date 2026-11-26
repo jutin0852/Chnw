@@ -234,7 +234,7 @@ export function FilmsManager({
 
       <div className="space-y-3">
         <div>
-          <h2 className="text-lg font-semibold">Worn by you, filmed by us</h2>
+          <h2 className="text-lg font-semibold">Captured moments</h2>
           <p className="text-sm text-muted-foreground">Four reels in a row on the home page. Each one links to the piece it shows. Choose the piece, then upload the film.</p>
         </div>
         <div className="grid gap-4 xl:grid-cols-2">
