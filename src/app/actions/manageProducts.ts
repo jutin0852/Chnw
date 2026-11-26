@@ -3,8 +3,8 @@
 import { requireAdmin } from "../../lib/admin-auth";
 import { db } from "../../lib/db";
 import { orderItems, orders, productImages, productVariants, products } from "../../lib/schema";
-import { and, eq, sql } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { and, asc, eq, sql } from "drizzle-orm";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { koboToNairaDecimal, parseNairaToKobo } from "@/lib/money";
 
 export async function updateProductStatus(
@@ -30,9 +30,50 @@ export async function deleteProduct(productId: string) {
   return { success: true };
 }
 
+/** Shows photo changes on the storefront straight away instead of after the cache expires. */
+async function refreshProductPhotos(productId: string) {
+  const [product] = await db.select({ slug: products.slug }).from(products).where(eq(products.id, productId)).limit(1);
+  revalidateTag("products", "max");
+  revalidatePath("/");
+  revalidatePath("/shop");
+  revalidatePath("/admin/product-media");
+  revalidatePath(`/admin/product-list/${productId}`);
+  if (product) revalidatePath(`/product/${product.slug}`);
+}
+
+const isImageUrl = (url: string) => /^https:\/\/res\.cloudinary\.com\//.test(url) && url.length <= 500;
+
 export async function deleteProductImage(imageId: number) {
   await requireAdmin();
-  await db.delete(productImages).where(eq(productImages.id, imageId));
+  const [removed] = await db.delete(productImages).where(eq(productImages.id, imageId)).returning({ productId: productImages.productId });
+  if (!removed) return { success: true };
+  // Close the gap so the remaining photos stay numbered 0, 1, 2...
+  const rest = await db.select({ id: productImages.id }).from(productImages).where(eq(productImages.productId, removed.productId)).orderBy(asc(productImages.displayOrder), asc(productImages.id));
+  await Promise.all(rest.map((image, displayOrder) => db.update(productImages).set({ displayOrder }).where(eq(productImages.id, image.id))));
+  await refreshProductPhotos(removed.productId);
+  return { success: true };
+}
+
+/** Swap one photo for a new upload, keeping its place in the gallery. */
+export async function replaceProductImage(imageId: number, imageUrl: string) {
+  await requireAdmin();
+  if (!isImageUrl(imageUrl)) return { success: false, message: "That image could not be used." };
+  const [updated] = await db.update(productImages).set({ imageUrl }).where(eq(productImages.id, imageId)).returning({ productId: productImages.productId });
+  if (!updated) return { success: false, message: "That photo no longer exists. Refresh the page." };
+  await refreshProductPhotos(updated.productId);
+  return { success: true };
+}
+
+/** Save a new photo order. The first photo is the main one on cards and the product page. */
+export async function reorderProductImages(productId: string, imageIds: number[]) {
+  await requireAdmin();
+  const current = await db.select({ id: productImages.id }).from(productImages).where(eq(productImages.productId, productId));
+  const known = new Set(current.map((image) => image.id));
+  if (imageIds.length !== current.length || !imageIds.every((id) => known.has(id))) {
+    return { success: false, message: "The photos changed while you were editing. Refresh the page." };
+  }
+  await Promise.all(imageIds.map((id, displayOrder) => db.update(productImages).set({ displayOrder }).where(and(eq(productImages.id, id), eq(productImages.productId, productId)))));
+  await refreshProductPhotos(productId);
   return { success: true };
 }
 
@@ -184,5 +225,6 @@ export async function addProductImages(productId: string, imageUrls: string[]) {
         displayOrder: current.length + index,
       })),
     );
+  await refreshProductPhotos(productId);
   return { success: true };
 }
