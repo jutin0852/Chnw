@@ -25,6 +25,7 @@ import {
   createProductAction,
 } from "../../actions/addProducts";
 import { getCategoryOptions } from "../../actions/manageCategories";
+import { ColourPicker } from "../../../components/admin/colour-picker";
 
 type ProductFormValues = z.infer<typeof ProductSchema>;
 
@@ -32,6 +33,7 @@ export default function AddProduct() {
   const [previews, setPreviews] = React.useState<string[]>([]);
   const [images, setImages] = React.useState<File[]>([]);
   const [sizeInventory, setSizeInventory] = React.useState<Record<string, number>>({});
+  const [colours, setColours] = React.useState<string[]>([]);
   const [categories, setCategories] = React.useState<{ id: string; name: string }[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const fileReplaceRef = React.useRef<HTMLInputElement | null>(null);
@@ -81,6 +83,7 @@ export default function AddProduct() {
       }
     });
     formData.set("variantInventory", JSON.stringify(sizeInventory));
+    formData.set("colours", JSON.stringify(colours));
 
     const slugExists = await checkSlugExists(data.productName);
     if (slugExists) {
@@ -395,13 +398,17 @@ export default function AddProduct() {
                 placeholder="S:2, M:5, L:1"
               />
             </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Colours</p>
+              <ColourPicker value={colours} onChange={setColours} />
+            </div>
             <Controller
               name="materials"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="materials">Materials</FieldLabel>
-                  <Input {...field} value={field.value || ""} id="materials" placeholder="e.g. 100% organic cotton" />
+                  <FieldLabel htmlFor="materials">Fabric</FieldLabel>
+                  <Input {...field} value={field.value || ""} id="materials" placeholder="e.g. Upcycled denim" />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}

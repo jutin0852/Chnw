@@ -10,3 +10,8 @@ test("order alert names what was ordered", () => {
     "Ada ordered A, B and 2 more.",
   );
 });
+
+test("order alert includes the chosen colour", () => {
+  assert.equal(describeOrderedItems("Ada", [{ name: "The Triangle Tote", size: "ONE_SIZE", colour: "Brown", quantity: 1 }]), "Ada ordered The Triangle Tote (Brown).");
+  assert.equal(describeOrderedItems("Ada", [{ name: "The Halter Tank", size: "UK 8", colour: "Olive green", quantity: 2 }]), "Ada ordered The Halter Tank (Olive green, UK 8) × 2.");
+});
