@@ -80,7 +80,7 @@ export default function CartDrawer({ open, onClose, fallbackImage, emptyContent,
                       <Link href={editHref(item)} onClick={onClose} className="font-display text-[19px] leading-[1.15] hover:text-thread">{item.productName}</Link>
                       <span className="label shrink-0 text-[13px] tracking-[0.02em]">{formatStorePrice(multiplyNairaDecimal(item.price, item.quantity))}</span>
                     </div>
-                    <p className="label text-[11px] text-stone">{sizeLabel(item.size)}</p>
+                    <p className="label text-[11px] text-stone">{[item.customizations?.color, sizeLabel(item.size)].filter(Boolean).join(" · ")}</p>
                     {item.customizations?.notes && <p className="text-[12px] text-stone">Note: {item.customizations.notes}</p>}
                     <div className="mt-auto flex items-center justify-between">
                       <div className="flex items-center rounded-full border border-[var(--line)]">

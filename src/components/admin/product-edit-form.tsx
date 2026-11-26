@@ -5,6 +5,7 @@ import Link from "next/link";
 import { updateProduct } from "../../app/actions/manageProducts";
 import { getCategoryOptions } from "../../app/actions/manageCategories";
 import type { Product, ProductVariant } from "../../lib/schema";
+import { ColourPicker } from "./colour-picker";
 
 export function ProductEditForm({
   product,
@@ -27,6 +28,7 @@ export function ProductEditForm({
   );
   const [sizes, setSizes] = useState((product.sizes || []).join(", "));
   const [materials, setMaterials] = useState(product.materials || "");
+  const [colours, setColours] = useState<string[]>(product.colours || []);
   const [care, setCare] = useState(product.careInstructions || "");
   const [isActive, setIsActive] = useState(product.isActive ?? true);
   const [unlimitedStock, setUnlimitedStock] = useState(product.unlimitedStock);
@@ -55,6 +57,7 @@ export function ProductEditForm({
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean),
+        colours,
         materials,
         careInstructions: care,
         isActive,
@@ -163,9 +166,13 @@ export function ProductEditForm({
             className="w-full rounded-md border bg-background px-3 py-2"
           />
         </label>
+        <div className="sm:col-span-2">
+          <span className="mb-2 block text-sm text-muted-foreground">Colours</span>
+          <ColourPicker value={colours} onChange={setColours} />
+        </div>
         <label>
           <span className="mb-2 block text-sm text-muted-foreground">
-            Materials
+            Fabric
           </span>
           <input
             value={materials}

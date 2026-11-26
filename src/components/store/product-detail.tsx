@@ -14,6 +14,7 @@ import { useCartFeedback } from "./use-cart-feedback";
 import { UK_SIZE_CHART, sizeLabel, sizeValue } from "./catalog";
 import type { Film } from "@/config/films";
 import { optionGroupFor } from "@/config/colourways";
+import { swatchFor } from "@/config/colours";
 
 type DetailProduct = StoreProduct & {
   sizes?: string[] | null;
@@ -39,6 +40,12 @@ export default function ProductDetail({ product, number, film }: { product: Deta
   const [sizeError, setSizeError] = useState(false);
   const [quantity, setQuantity] = useState(initialQuantity);
   const [notes, setNotes] = useState(initialCustomizations.notes || "");
+  const colours = product.colours || [];
+  const needsColour = colours.length > 0;
+  const [colour, setColour] = useState(
+    initialCustomizations.color && colours.includes(initialCustomizations.color) ? initialCustomizations.color : colours.length === 1 ? colours[0] : "",
+  );
+  const [colourError, setColourError] = useState(false);
   const { cart, removeItem, setBagOpen } = useCart();
   const { feedback, addWithFeedback, dismissFeedback } = useCartFeedback();
   const selectedVariant = product.variants.find((variant) => variant.size === (size || "ONE_SIZE"));
@@ -61,18 +68,23 @@ export default function ProductDetail({ product, number, film }: { product: Deta
     .reduce((total, item) => total + item.quantity, 0);
 
   function addProduct() {
+    if (needsColour && !colour) {
+      setColourError(true);
+      document.getElementById("colour-picker")?.scrollIntoView({ block: "center" });
+      return;
+    }
     if (needsSize && !size) {
       setSizeError(true);
       document.getElementById("size-picker")?.scrollIntoView({ block: "center" });
       return;
     }
     if (editMode) removeItem(product.id, initialSize, initialCustomizations);
-    addWithFeedback(product, size, quantity, { notes: notes.trim() || undefined });
+    addWithFeedback(product, size, quantity, { color: needsColour ? colour : undefined, notes: notes.trim() || undefined });
   }
 
   const ctaLabel = feedback?.success
     ? editMode ? "Bag updated" : "Added to bag"
-    : !isAvailable ? "Sold out" : editMode ? "Update bag" : needsSize && !size ? "Choose a size" : `Add${size && needsSize ? ` ${sizeLabel(size)}` : ""} to bag · ${formatStorePrice(product.price)}`;
+    : !isAvailable ? "Sold out" : editMode ? "Update bag" : needsColour && !colour ? "Choose a colour" : needsSize && !size ? "Choose a size" : `Add${size && needsSize ? ` ${sizeLabel(size)}` : ""} to bag · ${formatStorePrice(product.price)}`;
 
   const media = [
     { kind: "image" as const, image: gallery[0] },
@@ -160,6 +172,36 @@ export default function ProductDetail({ product, number, film }: { product: Deta
             </div>
           ) : (
             <>
+              {needsColour && (
+                <fieldset id="colour-picker" className="flex flex-col gap-3">
+                  <legend className="mb-3 flex w-full items-baseline justify-between gap-4 text-[14px]">
+                    <span>Colour{colour ? <strong className="ml-2 font-semibold">{colour}</strong> : null}</span>
+                    {colourError && !colour && <span className="label text-[11px] text-thread" role="alert">Choose a colour first</span>}
+                  </legend>
+                  <div className="flex flex-wrap gap-2">
+                    {colours.map((name) => {
+                      const active = colour === name;
+                      const swatch = swatchFor(name);
+                      return (
+                        <button
+                          key={name}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => {
+                            setColour(name);
+                            setColourError(false);
+                          }}
+                          className={`label inline-flex h-12 items-center gap-2.5 rounded-full border px-4 text-[13px] tracking-normal transition-colors duration-300 ${active ? "border-ink bg-ink text-paper" : "border-[var(--line)] hover:border-ink"}`}
+                        >
+                          {swatch && <span aria-hidden="true" className="size-4 rounded-full border border-white/50 shadow-[0_0_0_1px_rgba(20,18,16,0.25)]" style={{ background: swatch }} />}
+                          {name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </fieldset>
+              )}
+
               {needsSize && (
                 <fieldset id="size-picker" className="flex flex-col gap-3">
                   <legend className="mb-3 flex w-full items-baseline justify-between gap-4 text-[14px]">

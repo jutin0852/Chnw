@@ -6,6 +6,7 @@ import { orderItems, orders, productImages, productVariants, products } from "..
 import { and, asc, eq, sql } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { koboToNairaDecimal, parseNairaToKobo } from "@/lib/money";
+import { cleanColours } from "@/config/colours";
 
 export async function updateProductStatus(
   productId: string,
@@ -88,6 +89,7 @@ export async function updateProduct(
     sku?: string;
     categoryId?: string;
     sizes?: string[];
+    colours?: string[];
     materials?: string;
     careInstructions?: string;
     isActive: boolean;
@@ -167,6 +169,7 @@ export async function updateProduct(
       sku: values.sku?.trim() || null,
       categoryId: values.categoryId || null,
       sizes: nextVariants.map((variant) => variant.size),
+      colours: cleanColours(values.colours),
       materials: values.materials?.trim() || null,
       careInstructions: values.careInstructions?.trim() || null,
       isActive: values.isActive,
@@ -187,6 +190,7 @@ export async function updateProduct(
         sku: values.sku?.trim() || null,
         categoryId: values.categoryId || null,
         sizes: values.sizes ?? [],
+        colours: cleanColours(values.colours),
         materials: values.materials?.trim() || null,
         careInstructions: values.careInstructions?.trim() || null,
         isActive: values.isActive,

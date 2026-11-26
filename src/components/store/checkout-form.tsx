@@ -117,6 +117,7 @@ export default function CheckoutForm({ initialCustomer }: { initialCustomer?: { 
                   <div className="flex justify-between gap-2">
                     <div>
                       <p className="text-lg font-medium leading-tight">{item.productName}</p>
+                      {item.customizations?.color && <p className="mt-1 text-xs text-black/60">Colour {item.customizations.color}</p>}
                       {item.size && <p className="mt-1 text-xs text-black/60">Size {item.size}</p>}
                       {item.customizations?.notes && <p className="mt-1 text-xs text-black/50">Note: {item.customizations.notes}</p>}
                     </div>

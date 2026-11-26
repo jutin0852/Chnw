@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { requireAdmin } from "../../lib/admin-auth";
 import { revalidatePath } from "next/cache";
 import { koboToNairaDecimal, parseNairaToKobo } from "@/lib/money";
+import { cleanColours } from "@/config/colours";
 
 // import { revalidatePath } from "next/cache";
 
@@ -51,6 +52,13 @@ export async function createProductAction(formData: FormData) {
     materials: formData.get("materials") || undefined,
     careInstructions: formData.get("careInstructions") || undefined,
   });
+
+  let colours: string[] = [];
+  try {
+    colours = cleanColours(JSON.parse(String(formData.get("colours") || "[]")));
+  } catch {
+    return { message: "The colour list could not be read. Please pick the colours again." };
+  }
 
   const variantInventory: Record<string, number> = {};
   try {
@@ -98,6 +106,7 @@ export async function createProductAction(formData: FormData) {
     unlimitedStock,
     sizes: validatedProductFields.data.sizes ?? [],
     inventoryMigrationStatus: "migrated",
+    colours,
     materials: validatedProductFields.data.materials ?? null,
     careInstructions: validatedProductFields.data.careInstructions ?? null,
   };

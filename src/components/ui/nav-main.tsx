@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function NavMain({
   items,
@@ -30,12 +31,16 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
+              {/* The whole row is the link, not just the words. */}
               <SidebarMenuButton
+                asChild
                 tooltip={item.title}
                 isActive={pathname === item.url}
               >
-                {item.icon && <item.icon />}
-                <a href={`${item.url}`}>{item.title}</a>
+                <Link href={item.url}>
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

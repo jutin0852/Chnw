@@ -114,6 +114,8 @@ export const products = pgTable("products", {
   isActive: boolean("is_active").default(true),
   featured: boolean("featured").default(false),
   sizes: jsonb("sizes").$type<string[]>().default([]), // ["XS", "S", "M", "L", "XL"]
+  // Colours the customer chooses from on the product page (e.g. ["Black", "Brown"]). Empty = one colour.
+  colours: jsonb("colours").$type<string[]>().default([]),
   inventoryMigrationStatus: text("inventory_migration_status").notNull().default("legacy"), // legacy, needs_reconciliation, migrated
   inventoryReconciliationRequired: boolean("inventory_reconciliation_required").notNull().default(false),
   // Made after the order is placed, so it never sells out. Stock counts are ignored while this is on.

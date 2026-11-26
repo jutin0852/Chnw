@@ -139,6 +139,11 @@ export async function createOrder(formData: FormData): Promise<CheckoutResult> {
         } else if (item.variantId || (item.size && product.sizes && !product.sizes.includes(item.size))) {
           throw new Error(`${product.productName} does not offer size ${item.size || "selected"}.`);
         }
+        // A piece offered in several colours needs one of them; others never carry a colour.
+        const offered = product.colours || [];
+        const color = item.customizations?.color;
+        if (offered.length && (!color || !offered.includes(color))) throw new Error(`Choose a colour for ${product.productName} before checking out.`);
+        const customizations = item.customizations ? { ...item.customizations, color: offered.length ? color : undefined } : undefined;
         const quantity = item.quantity;
         const unitPriceKobo = parseNairaToKobo(product.price);
         if (unitPriceKobo <= BigInt(0)) throw new Error(`${product.productName} has an invalid price.`);
@@ -149,7 +154,7 @@ export async function createOrder(formData: FormData): Promise<CheckoutResult> {
           size: item.size,
           unitPriceKobo,
           totalPriceKobo: unitPriceKobo * BigInt(quantity),
-          customizations: item.customizations,
+          customizations,
         };
       });
       const legacyQuantities = new Map<string, number>();

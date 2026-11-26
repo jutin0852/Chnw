@@ -11,12 +11,15 @@ type OrderItem = {
   customizations: Record<string, unknown> | null;
 };
 
+const CUSTOMIZATION_LABELS: Record<string, string> = { color: "Colour", desiredLength: "Desired length", customerHeight: "Height", notes: "Note" };
+
 function formatCustomizations(customizations: OrderItem["customizations"]) {
   if (!customizations) return [];
 
   return Object.entries(customizations)
-    .filter(([, value]) => value !== null && value !== undefined && value !== "")
-    .map(([label, value]) => `${label.replace(/([A-Z])/g, " $1")}: ${String(value)}`);
+    // Colour has its own column above.
+    .filter(([key, value]) => key !== "color" && value !== null && value !== undefined && value !== "")
+    .map(([key, value]) => `${CUSTOMIZATION_LABELS[key] ?? key.replace(/([A-Z])/g, " $1")}: ${String(value)}`);
 }
 
 export function OrderItemsList({ items }: { items: OrderItem[] }) {
@@ -43,7 +46,13 @@ export function OrderItemsList({ items }: { items: OrderItem[] }) {
                 </div>
               </div>
 
-              <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
+              <dl className={`mt-4 grid gap-3 text-sm ${item.customizations?.color ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}`}>
+                {item.customizations?.color ? (
+                  <div>
+                    <dt className="text-muted-foreground">Colour</dt>
+                    <dd className="mt-1 font-medium">{String(item.customizations.color)}</dd>
+                  </div>
+                ) : null}
                 <div>
                   <dt className="text-muted-foreground">Size</dt>
                   <dd className="mt-1 font-medium">{item.size || "—"}</dd>

@@ -21,6 +21,8 @@ export type StoreProduct = {
   images: { id: number; imageUrl: string; altText: string | null }[];
   category: { name: string; slug?: string } | null;
   sizes?: string[] | null;
+  /** Colours the customer chooses from; empty or missing means one colour. */
+  colours?: string[] | null;
   materials?: string | null;
   careInstructions?: string | null;
 };

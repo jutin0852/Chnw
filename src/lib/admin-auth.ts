@@ -4,8 +4,13 @@ import { redirect } from "next/navigation";
 import { db } from "./db";
 import { user } from "./schema";
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 
-export async function getSessionUser() {
+/**
+ * The signed-in user, looked up once per request. The admin layout and the page both ask for it,
+ * so without the cache every admin page did the session and user queries twice.
+ */
+export const getSessionUser = cache(async function getSessionUser() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return null;
   const userData = await db
@@ -15,7 +20,7 @@ export async function getSessionUser() {
     .limit(1);
 
   return userData[0] || null;
-}
+});
 
 export async function getCurrentUser() {
   const currentUser = await getSessionUser();

@@ -138,6 +138,7 @@ async function finalizeOrderPayment(reference: string, fetchPayment: () => Promi
             name: item.productName,
             quantity: item.quantity,
             size: item.size,
+            colour: item.customizations?.color || null,
             unitPrice: item.unitPrice,
             totalPrice: item.totalPrice,
           })),
@@ -147,10 +148,13 @@ async function finalizeOrderPayment(reference: string, fetchPayment: () => Promi
     if ("confirmation" in result && result.confirmation) {
       const confirmation = result.confirmation;
       const itemsText = confirmation.items
-        .map((item) => `- ${item.name} × ${item.quantity}${item.size ? ` (size ${item.size})` : ""} — ${formatNairaDecimal(item.totalPrice)}`)
+        .map((item) => {
+          const details = [item.colour ? `colour ${item.colour}` : "", item.size ? `size ${item.size}` : ""].filter(Boolean).join(", ");
+          return `- ${item.name} × ${item.quantity}${details ? ` (${details})` : ""} — ${formatNairaDecimal(item.totalPrice)}`;
+        })
         .join("\n");
       const itemsHtml = result.confirmation.items
-        .map((item) => `<tr><td style="padding:12px 0;border-bottom:1px solid var(--brand-line)"><strong>${escapeHtml(item.name)}</strong>${item.size ? `<br><span style="color:#666;font-size:12px">Size ${escapeHtml(item.size)}</span>` : ""}</td><td style="padding:12px 0;border-bottom:1px solid var(--brand-line);text-align:center">${item.quantity}</td><td style="padding:12px 0;border-bottom:1px solid var(--brand-line);text-align:right">${formatNairaDecimal(item.totalPrice)}</td></tr>`)
+        .map((item) => `<tr><td style="padding:12px 0;border-bottom:1px solid var(--brand-line)"><strong>${escapeHtml(item.name)}</strong>${item.colour ? `<br><span style="color:#666;font-size:12px">Colour ${escapeHtml(item.colour)}</span>` : ""}${item.size ? `<br><span style="color:#666;font-size:12px">Size ${escapeHtml(item.size)}</span>` : ""}</td><td style="padding:12px 0;border-bottom:1px solid var(--brand-line);text-align:center">${item.quantity}</td><td style="padding:12px 0;border-bottom:1px solid var(--brand-line);text-align:right">${formatNairaDecimal(item.totalPrice)}</td></tr>`)
         .join("");
       try {
         await sendEmail({
@@ -168,7 +172,7 @@ async function finalizeOrderPayment(reference: string, fetchPayment: () => Promi
         orderNumber: result.orderNumber,
         customerName: confirmation.customerName,
         totalLabel: formatNairaDecimal(confirmation.totalAmount),
-        items: confirmation.items.map((item) => ({ name: item.name, size: item.size, quantity: item.quantity })),
+        items: confirmation.items.map((item) => ({ name: item.name, size: item.size, colour: item.colour, quantity: item.quantity })),
       });
     }
     return { state: result.state, orderNumber: result.orderNumber } as PaymentVerificationResult;
