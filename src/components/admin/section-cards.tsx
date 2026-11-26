@@ -21,7 +21,7 @@ export function SectionCards({ cardData }: { cardData: CardData[] }) {
   return (
     <div className="grid grid-cols-1 gap-3 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {cardData.map((card, i) => (
-        <Card className="@container/card rounded-none border-black/15 bg-white shadow-none" key={i} data-slot="card">
+        <Card className="@container/card rounded-lg border-black/15 bg-white shadow-none" key={i} data-slot="card">
           <CardHeader className="gap-2">
             <CardDescription className="text-[10px] font-semibold uppercase tracking-[.14em] text-black/55">{card.description}</CardDescription>
             <CardTitle className="text-3xl font-semibold tabular-nums tracking-tight">

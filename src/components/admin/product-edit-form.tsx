@@ -223,7 +223,7 @@ export function ProductEditForm({
             setNewSize("");
           }}>Add size</button>
         </div>
-        <div className="overflow-x-auto border">
+        <div className="overflow-x-auto rounded-lg border">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b bg-muted/40"><tr><th className="p-3">Size</th><th className="p-3">SKU</th>{!unlimitedStock && <th className="p-3">Available</th>}<th className="p-3">Taking orders</th></tr></thead>
             <tbody>{variants.map((variant, index) => <tr key={variant.id} className="border-b last:border-0">

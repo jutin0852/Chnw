@@ -169,7 +169,7 @@ export default function AddProduct() {
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-black sm:text-4xl">Add a product</h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-black/60">Build a complete listing with the details customers need before it goes live.</p>
         </div>
-        <p className="max-w-xs border-l-4 border-[var(--brand)] bg-[var(--brand-tint)] px-4 py-3 text-xs leading-5 text-black/70">Add product information, stock, and up to five product images before publishing.</p>
+        <p className="max-w-xs rounded-md border-l-4 border-[var(--brand)] bg-[var(--brand-tint)] px-4 py-3 text-xs leading-5 text-black/70">Add product information, stock, and up to five product images before publishing.</p>
       </div>
       <form
         onSubmit={form.handleSubmit((data) => onFormSubmit(data, images))}
@@ -177,7 +177,7 @@ export default function AddProduct() {
         className="pb-8"
       >
         <FieldGroup className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,.75fr)]">
-          <section className="flex w-full flex-col gap-5 border border-black/15 bg-white p-5 shadow-none sm:p-7">
+          <section className="flex w-full flex-col gap-5 rounded-lg border border-black/15 bg-white p-5 shadow-none sm:p-7">
             <div className="border-b border-black/15 pb-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--brand)]">Product details</p>
               <h2 className="mt-2 text-xl font-semibold tracking-tight">The essentials</h2>
@@ -296,11 +296,11 @@ export default function AddProduct() {
               render={({ field }) => (
                 <fieldset className="space-y-2">
                   <legend className="text-sm font-medium">Stock</legend>
-                  <label className="flex items-start gap-3 border border-black/15 p-3 text-sm">
+                  <label className="flex items-start gap-3 rounded-md border border-black/15 p-3 text-sm">
                     <input type="radio" name="stock-mode" className="mt-1" checked={field.value !== false} onChange={() => field.onChange(true)} />
                     <span><span className="block font-medium">Unlimited, made after order</span><span className="mt-0.5 block text-xs text-black/60">Never sells out. Switch sizes off later to pause orders.</span></span>
                   </label>
-                  <label className="flex items-start gap-3 border border-black/15 p-3 text-sm">
+                  <label className="flex items-start gap-3 rounded-md border border-black/15 p-3 text-sm">
                     <input type="radio" name="stock-mode" className="mt-1" checked={field.value === false} onChange={() => field.onChange(false)} />
                     <span><span className="block font-medium">Limited stock</span><span className="mt-0.5 block text-xs text-black/60">Enter how many you have. A size at 0 shows as sold out.</span></span>
                   </label>
@@ -354,7 +354,7 @@ export default function AddProduct() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="categoryId">Category</FieldLabel>
-                  <select {...field} id="categoryId" className="h-10 w-full border border-black/20 bg-white px-3 text-sm outline-none transition focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20">
+                  <select {...field} id="categoryId" className="h-10 w-full rounded-md border border-black/20 bg-white px-3 text-sm outline-none transition focus:border-[var(--brand)] focus:ring-2 focus:ring-[var(--brand)]/20">
                     <option value="">Uncategorised</option>
                     {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                   </select>
@@ -461,7 +461,7 @@ export default function AddProduct() {
             </Field>
           </section>
 
-          <section className="w-full border border-black/15 bg-white p-5 shadow-none sm:p-7 lg:sticky lg:top-6">
+          <section className="w-full rounded-lg border border-black/15 bg-white p-5 shadow-none sm:p-7 lg:sticky lg:top-6">
             <div className="border-b border-black/15 pb-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--brand)]">Product photography</p>
               <h2 className="mt-2 text-xl font-semibold tracking-tight">Add images</h2>
@@ -475,7 +475,7 @@ export default function AddProduct() {
                     return (
                       <div
                         key={i}
-                        className="relative w-full overflow-hidden border border-black/15 bg-[var(--brand-tint)] p-3"
+                        className="relative w-full overflow-hidden rounded-lg border border-black/15 bg-[var(--brand-tint)] p-3"
                       >
                         <Image
                           src={src}
@@ -500,7 +500,7 @@ export default function AddProduct() {
                   return (
                     <div
                       key={i}
-                      className="relative w-[calc(50%-0.375rem)] overflow-hidden border border-black/15 bg-[var(--brand-tint)] p-2 sm:w-[calc(33.333%-0.5rem)]"
+                      className="relative w-[calc(50%-0.375rem)] overflow-hidden rounded-md border border-black/15 bg-[var(--brand-tint)] p-2 sm:w-[calc(33.333%-0.5rem)]"
                     >
                       <Image
                         src={src}
@@ -521,7 +521,7 @@ export default function AddProduct() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-5 flex w-full items-center justify-center border border-dashed border-black/30 bg-[var(--brand-canvas)] px-4 py-5 text-sm font-semibold text-black transition hover:border-[var(--brand)] hover:bg-[var(--brand-tint)]"
+                className="mt-5 flex w-full items-center justify-center rounded-lg border border-dashed border-black/30 bg-[var(--brand-canvas)] px-4 py-5 text-sm font-semibold text-black transition hover:border-[var(--brand)] hover:bg-[var(--brand-tint)]"
               >
                 <IconCirclePlus className="mr-2" size={20} />
                 Add images ({images.length}/5)

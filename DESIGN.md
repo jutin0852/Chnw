@@ -150,12 +150,14 @@ Screenshot:  Three reels side by side with the white Bodoni CHNW across them.
 - Palette: paper #FFFFFF (ground), ink #141210 (text, dark bands), thread red #A40009 (accent, CTAs, wipes), mist #F3F1EE (banded sections), stone #5E574F (muted text).
 - Type: Bodoni Moda (display, wordmark), Instrument Sans (reading), Courier Prime (labels, prices, nav, after Deadly Ponies). All via next/font/google.
 - Shape: pills for actions, square everything else on the storefront. Dashed red "stitch" rule as the divider and checkout progress.
+- Admin shape: rounded throughout. Panels, cards, tables and drop zones use `rounded-lg` with a border; inputs, buttons and thumbnails use `rounded-md`. Nothing square in the admin.
 - Motion: GSAP + Lenis on one clock (`src/engine`), SplitText headline reveals, clip reveals on media, red curtain between storefront pages (`src/engine/transition.ts`). Admin, checkout and account keep native scroll and plain navigation. Everything switches off under reduced motion; hero films start paused and every film can be paused.
 - Films: Instagram reels on Cloudinary (`chnw/video/<post code>`), mapped in `src/config/films.ts`, replaceable in /admin/films. Reels play only while on screen.
 
 ### Decisions
 - 2026-11-10: Reels are 720×1280, so the desktop hero shows three side by side at native sharpness instead of stretching one (after Balmoral's full-screen film, adapted). Phones show the middle reel alone.
 - 2026-11-10: Page background is pure white (owner's choice over linen).
+- 2026-11-26: Admin boxes, tables and inputs made consistently rounded (owner's choice); the storefront stays square.
 - 2026-11-26: The "Worn by you, filmed by us" reels are managed in /admin/films: four slots, each a film and the piece it links to.
 - 2026-11-10: Product size picker uses CHNW's UK 4 to 20 chart (replaces the template's S/M/L/XL table). No size is preselected.
 - 2026-11-10: New `/shop` page holds the filterable grid; home is editorial. Header links use `?category=`.
