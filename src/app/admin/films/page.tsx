@@ -28,7 +28,7 @@ export default async function FilmsPage() {
     <section className="@container/main flex flex-1 flex-col gap-6 px-4 py-6 lg:px-6">
       <div>
         <h1 className="text-xl font-semibold">Films</h1>
-        <p className="text-sm text-muted-foreground">Choose the films shown in the home page hero, the crochet skirt section on the home page, and the featured film on the shop page. Upload a short vertical clip (MP4 or MOV, up to 100 MB). Films are shrunk automatically when you upload them (720 pixels wide, no sound), so they load fast and use little storage. They appear on the store within a minute.</p>
+        <p className="text-sm text-muted-foreground">Choose the films shown in the home page hero, the crochet skirt section on the home page, and the featured film on the shop page. Upload a short vertical clip (MP4 or MOV, up to 100 MB). Films are shrunk automatically when you upload them (1080 pixels wide, no sound). Upload the original camera file, not one saved from Instagram or WhatsApp, for the sharpest result. They appear on the store within a minute.</p>
       </div>
       <FilmsManager hero={hero} productFilms={productFilms} />
     </section>

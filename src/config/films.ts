@@ -7,9 +7,12 @@ const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "nwrotdpo";
 /**
  * MP4 (H.264, no audio) sized for the slot, with a capped bitrate: about half the size of the plain
  * q_auto version at 720px, two thirds smaller at 540px. Cloudinary transcodes once, then serves from its CDN.
+ * `sharp` is for the home hero, which fills the screen: high quality, a generous bitrate cap, and
+ * never wider than the source (c_limit), so it stays crisp on large and high-density screens.
  */
-export function filmSrc(code: string, width = 720) {
-  return `https://res.cloudinary.com/${cloud}/video/upload/br_${width <= 540 ? 900 : 1400}k,vc_h264,ac_none,w_${width},c_limit/${publicId(code)}.mp4`;
+export function filmSrc(code: string, width = 720, sharp = false) {
+  const settings = sharp ? `q_auto:best,br_${width >= 1080 ? 6000 : 4000}k` : `br_${width <= 540 ? 900 : 1400}k`;
+  return `https://res.cloudinary.com/${cloud}/video/upload/${settings},vc_h264,ac_none,w_${width},c_limit/${publicId(code)}.mp4`;
 }
 
 /** A film is either an Instagram post code (older films) or a full Cloudinary public id (uploaded in the admin). */

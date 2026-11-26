@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 
 // Signs a direct browser upload of a video into chnw/video-uploads (admin only).
-// The incoming transformation means Cloudinary stores only the compressed copy (720px wide,
+// The incoming transformation means Cloudinary stores only the compressed copy (1080px wide,
 // H.264, no audio, auto-quality), never the large original, so uploads cannot eat the storage.
 export async function POST() {
   await requireAdmin();
@@ -14,7 +14,7 @@ export async function POST() {
 
   const timestamp = Math.round(Date.now() / 1000);
   const folder = "chnw/video-uploads";
-  const transformation = "c_limit,w_720,vc_h264,q_auto:eco,ac_none";
+  const transformation = "c_limit,w_1080,vc_h264,q_auto:good,ac_none";
   const signature = cloudinary.utils.api_sign_request({ timestamp, folder, transformation }, apiSecret);
   return NextResponse.json({ timestamp, signature, cloudName, apiKey, folder, transformation });
 }

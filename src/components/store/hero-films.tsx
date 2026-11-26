@@ -5,7 +5,7 @@ import { filmPoster, filmSrc, type Film } from "@/config/films";
 import { prefersReducedMotion } from "@/engine";
 
 /**
- * Three reels side by side on desktop (each at its native sharpness), the middle reel alone on
+ * Three reels side by side on desktop (each at full 1080px sharpness), the middle reel alone on
  * phones. Side films only load on wide screens. Paused by default under reduced motion, and
  * always pausable (they loop for longer than 5 seconds).
  */
@@ -17,7 +17,7 @@ export default function HeroFilms({ films }: { films: Film[] }) {
     const wide = matchMedia("(min-width: 768px)").matches;
     refs.current.forEach((video, i) => {
       if (!video) return;
-      if (i !== 1 && wide && !video.src) video.src = filmSrc(films[i].code, 540);
+      if (i !== 1 && wide && !video.src) video.src = filmSrc(films[i].code, 1080, true);
     });
     if (prefersReducedMotion()) {
       refs.current.forEach((v) => v?.pause());
@@ -45,8 +45,8 @@ export default function HeroFilms({ films }: { films: Film[] }) {
               ref={(el) => {
                 refs.current[i] = el;
               }}
-              src={i === 1 ? filmSrc(film.code) : undefined}
-              poster={filmPoster(film.code, i === 1 ? 720 : 540)}
+              src={i === 1 ? filmSrc(film.code, 1080, true) : undefined}
+              poster={filmPoster(film.code, 1080)}
               autoPlay
               muted
               loop
