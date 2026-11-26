@@ -112,7 +112,7 @@ export default function ProductDetail({ product, number, film }: { product: Deta
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : undefined}
                   sizes={i === 0 ? "(max-width: 1023px) 86vw, 58vw" : "(max-width: 1023px) 86vw, 29vw"}
-                  quality={80}
+                  quality={85}
                   src={item.image.imageUrl}
                   alt={item.image.altText || product.productName}
                   className="object-cover"
@@ -212,8 +212,8 @@ export default function ProductDetail({ product, number, film }: { product: Deta
               )}
 
               <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border border-ink p-4 font-mono text-[13px]">
-                <dt className="text-stone">Made in</dt><dd>5 to 7 business days</dd>
-                <dt className="text-stone">Material</dt><dd>{product.materials || "Made by hand"}</dd>
+                <dt className="text-stone">Made in</dt><dd>7 to 10 business days</dd>
+                <dt className="text-stone">Fabric</dt><dd>{product.materials || "Denim"}</dd>
                 <dt className="text-stone">If it&apos;s not right</dt><dd>Adjusted within 30 days</dd>
               </dl>
 
@@ -248,8 +248,8 @@ export default function ProductDetail({ product, number, film }: { product: Deta
 
           <div className="flex flex-col border-t border-[var(--line)]">
             {[
-              ["Details and care", `${product.materials ? `${product.materials}.` : "Made by hand."} ${product.careInstructions || "Follow the care label to keep the fabric and finish at their best."}`],
-              ["Delivery", "Made and delivered in 5 to 7 business days after you order. Delivery is paid by the customer and shown at checkout."],
+              ["Details and care", `${product.materials ? `${product.materials}.` : "Denim."} ${product.careInstructions || "Follow the care label to keep the fabric and finish at their best."}`],
+              ["Delivery", "Made and delivered in 7 to 10 business days after you order. Delivery is paid by the customer and shown at checkout."],
               ["Adjustments, not refunds", "Bring a piece back within 30 days and we adjust or remake it. Sale and customised pieces are final. Upcycled pieces can differ slightly from the photos."],
             ].map(([title, copy]) => (
               <details key={title} className="group border-b border-[var(--line)] py-4">

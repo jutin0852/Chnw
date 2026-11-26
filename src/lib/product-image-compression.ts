@@ -1,5 +1,12 @@
-const MAX_PRODUCT_IMAGE_DIMENSION = 1600;
-const PRODUCT_IMAGE_QUALITY = 0.82;
+// Phone photos are stored at up to 2560px and high quality, so they stay sharp on large and
+// high-density screens. Shoppers never download this copy: Cloudinary serves each screen a
+// resized AVIF/WebP (see cloudinary-loader.ts), which keeps pages fast.
+const MAX_PRODUCT_IMAGE_DIMENSION = 2560;
+const PRODUCT_IMAGE_QUALITY = 0.92;
+/** Largest photo accepted from the phone, before it is resized. */
+export const MAX_PRODUCT_IMAGE_BYTES = 30 * 1024 * 1024;
+/** Cloudinary's per-image upload limit on the free plan. */
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -28,12 +35,18 @@ function canvasToWebp(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 /**
- * Creates the only product-photo copy that is sent to Cloudinary. Originals
- * stay with the merchant, while the store receives a 1600px WebP suitable for
- * product pages and high-density mobile displays.
+ * Creates the only product-photo copy that is sent to Cloudinary: a high-quality WebP up to 2560px.
+ * If the browser cannot read the photo (e.g. an iPhone HEIC photo outside Safari), the original is
+ * sent as it is and Cloudinary converts it, as long as it is within the upload limit.
  */
 export async function compressProductImage(file: File): Promise<File> {
-  const image = await loadImage(file);
+  let image: HTMLImageElement;
+  try {
+    image = await loadImage(file);
+  } catch (error) {
+    if (file.size <= MAX_UPLOAD_BYTES) return file;
+    throw error;
+  }
   const scale = Math.min(1, MAX_PRODUCT_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight));
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
   const height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -43,6 +56,8 @@ export async function compressProductImage(file: File): Promise<File> {
   canvas.height = height;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Image compression is unavailable in this browser.");
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
   context.drawImage(image, 0, 0, width, height);
 
   const blob = await canvasToWebp(canvas);

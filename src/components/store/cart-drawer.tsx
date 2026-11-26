@@ -97,7 +97,7 @@ export default function CartDrawer({ open, onClose, fallbackImage, emptyContent,
             <div className="flex flex-col gap-3 border-t border-[var(--line)] px-5 pb-6 pt-4">
               <div className="border border-ink p-3">
                 <p className="label text-[11px] text-thread">Made for you</p>
-                <p className="mt-1 text-[14px] leading-[1.5]">Your pieces are made after you pay and arrive in 5 to 7 business days.</p>
+                <p className="mt-1 text-[14px] leading-[1.5]">Your pieces are made after you pay and arrive in 7 to 10 business days.</p>
               </div>
               <div className="flex justify-between text-[16px]">
                 <span>Subtotal</span>

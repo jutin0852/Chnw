@@ -132,7 +132,7 @@ export default function CheckoutForm({ initialCustomer }: { initialCustomer?: { 
             ))}
           </div>
           <div className="mt-6 flex justify-between border-b border-black pb-5 text-2xl font-medium tracking-[-0.04em]"><span>Total</span><span>{formatStorePrice(cartTotal)}</span></div>
-          <p className="mt-5 max-w-sm text-xs leading-5 text-black/60">Nigeria delivery is available now. Delivery is paid by the customer and takes approximately 5–7 working days after your order is confirmed.</p>
+          <p className="mt-5 max-w-sm text-xs leading-5 text-black/60">Nigeria delivery is available now. Delivery is paid by the customer and takes approximately 7–10 working days after your order is confirmed.</p>
         </aside>
       </div>
     </main>

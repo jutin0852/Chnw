@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { handlecloudinaryUpload } from "../../lib/cloudinary";
-import { compressProductImages } from "../../lib/product-image-compression";
+import { compressProductImages, MAX_PRODUCT_IMAGE_BYTES } from "../../lib/product-image-compression";
 import { addProductImages } from "../../app/actions/manageProducts";
 
 export function ProductMediaUpload({
@@ -34,8 +34,8 @@ export function ProductMediaUpload({
       setMessage("Choose image files only.");
       return;
     }
-    if (files.some((file) => file.size > 5 * 1024 * 1024)) {
-      setMessage("Each image must be 5MB or smaller.");
+    if (files.some((file) => file.size > MAX_PRODUCT_IMAGE_BYTES)) {
+      setMessage("Each image must be 30MB or smaller.");
       return;
     }
 
