@@ -24,15 +24,17 @@ export default function ShopGrid({
   products,
   numbers,
   initialCategory,
+  initialQuery = "",
   feature,
 }: {
   products: StoreProduct[];
   numbers: Record<string, string>;
   initialCategory: string;
+  initialQuery?: string;
   feature?: Feature;
 }) {
   const [category, setCategory] = useState(initialCategory);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [size, setSize] = useState("all");
   const [priceRange, setPriceRange] = useState<PriceRange>("all");
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
@@ -55,7 +57,7 @@ export default function ShopGrid({
       const price = parseNairaToKobo(p.price);
       return (
         (category === "all" || p.category?.slug === category) &&
-        (!q || p.productName.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.category?.name.toLowerCase().includes(q)) &&
+        (!q || q.split(/\s+/).every((w) => [p.productName, p.description, p.category?.name, ...(p.colours || [])].join(" ").toLowerCase().includes(w))) &&
         (size === "all" || p.sizes?.includes(size)) &&
         (priceRange === "all" ||
           (priceRange === "under-50000" && price < BigInt(5000000)) ||

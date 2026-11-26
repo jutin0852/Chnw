@@ -95,10 +95,10 @@ export default async function Home() {
               <div className="flex flex-col items-start gap-6">
                 <p className="label text-[12px] text-thread">The fabric vs what we make</p>
                 <h2 id="fabric-title" data-split="lines" className="font-display text-[42px] leading-[1.02] sm:text-[60px]">
-                  From a bolt of crochet denim to the skirt you wear.
+                  From denim fabric to denim skirt.
                 </h2>
                 <p className="max-w-[440px] text-[17px] leading-[1.6] text-[#3d3832]">
-                  Each skirt is cut and crocheted once you order it, so no two come out quite the same. Watch one come together, then choose your size.
+                  Made from shredded denim, crocheted by hand and finished into a skirt.
                 </p>
                 {crochet && (
                   <Link href={`/product/${crochet.slug}`} className="pill pill--ink">
@@ -114,7 +114,6 @@ export default async function Home() {
                 {crochet?.images[0] && (
                   <figure className="relative mt-16 aspect-[9/16] overflow-hidden bg-paper sm:mt-24" data-reveal="clip" data-delay="0.12">
                     <Image src={crochet.images[0].imageUrl} alt={crochet.images[0].altText || "The finished Crochet Denim Skirt"} fill sizes="(max-width: 1023px) 50vw, 30vw" className="object-cover" />
-                    <figcaption className="label absolute left-3 top-3 bg-thread px-2.5 py-1.5 text-[11px] text-white">Finished</figcaption>
                   </figure>
                 )}
               </div>
