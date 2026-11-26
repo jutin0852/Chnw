@@ -19,6 +19,7 @@ export async function updateProductStatus(
     .update(products)
     .set({ [field]: value, updatedAt: new Date() })
     .where(eq(products.id, productId));
+  revalidateTag("products", "max");
   revalidatePath("/");
   revalidatePath("/sitemap.xml");
   return { success: true };
@@ -26,7 +27,11 @@ export async function updateProductStatus(
 
 export async function deleteProduct(productId: string) {
   await requireAdmin();
+  // Past orders keep a link to the product, so the database refuses to delete it.
+  const [ordered] = await db.select({ id: orderItems.id }).from(orderItems).where(eq(orderItems.productId, productId)).limit(1);
+  if (ordered) return { success: false, message: "This product has orders, so it can't be deleted. Turn off \u201cActive\u201d to hide it from the shop instead." };
   await db.delete(products).where(eq(products.id, productId));
+  revalidateTag("products", "max");
   revalidatePath("/");
   revalidatePath("/sitemap.xml");
   return { success: true };

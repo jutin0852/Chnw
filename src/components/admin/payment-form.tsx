@@ -1,4 +1,5 @@
 "use client";
+import { notify } from "@/lib/admin-toast";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,11 @@ export function PaymentForm({ invoiceId, customerName, balance, today }: { invoi
     setError("");
     startTransition(async () => {
       const result = await recordPayment({ invoiceId, amount, paidAt, method, bank: method === "cash" ? "" : bank, chequeNumber, receivedFrom, beingPaymentFor });
-      if (!result.success) return setError(result.message);
+      if (!result.success) {
+        notify.failed("Payment not recorded", result.message || undefined);
+        return setError(result.message);
+      }
+      notify.done("Payment recorded", "The receipt is ready.");
       router.push(`/admin/invoices/${invoiceId}/receipts/${result.id}`);
       router.refresh();
     });

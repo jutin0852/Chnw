@@ -1,4 +1,5 @@
 "use client";
+import { notify } from "@/lib/admin-toast";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -11,12 +12,17 @@ function useAction() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState("");
-  function run(task: () => Promise<ActionResult>) {
+  function run(task: () => Promise<ActionResult>, doneTitle: string) {
     setMessage("");
     startTransition(async () => {
       const result = await task();
-      setMessage(result.message);
-      if (result.success) router.refresh();
+      if (result.success) {
+        notify.done(doneTitle, result.message || undefined);
+        router.refresh();
+      } else {
+        setMessage(result.message);
+        notify.failed("That didn't work", result.message || undefined);
+      }
     });
   }
   return { pending, message, run };
@@ -28,7 +34,7 @@ export function InvoiceStatusControls({ invoiceId, status, canVoid }: { invoiceI
   return (
     <div className="flex flex-wrap items-center gap-2">
       {status === "draft" && (
-        <Button type="button" variant="outline" disabled={pending} onClick={() => run(() => markInvoiceSent(invoiceId))}>Mark as sent</Button>
+        <Button type="button" variant="outline" disabled={pending} onClick={() => run(() => markInvoiceSent(invoiceId), "Invoice marked as sent")}>Mark as sent</Button>
       )}
       {canVoid && (
         <Button
@@ -37,7 +43,7 @@ export function InvoiceStatusControls({ invoiceId, status, canVoid }: { invoiceI
           disabled={pending}
           onClick={() => {
             const reason = window.prompt("Why are you voiding this invoice?");
-            if (reason) run(() => voidInvoice(invoiceId, reason));
+            if (reason) run(() => voidInvoice(invoiceId, reason), "Invoice voided");
           }}
         >
           Void invoice
@@ -58,7 +64,7 @@ export function VoidReceiptButton({ paymentId }: { paymentId: string }) {
         className="text-sm underline disabled:opacity-50"
         onClick={() => {
           const reason = window.prompt("Why are you voiding this receipt? (e.g. entered by mistake)");
-          if (reason) run(() => voidPayment(paymentId, reason));
+          if (reason) run(() => voidPayment(paymentId, reason), "Receipt voided");
         }}
       >
         Void
@@ -79,7 +85,11 @@ export function DeleteInvoiceButton({ invoiceId, invoiceNumber, receiptCount }: 
     setMessage("");
     startTransition(async () => {
       const result = await deleteInvoice(invoiceId);
-      if (!result.success) return setMessage(result.message);
+      if (!result.success) {
+        notify.failed("Invoice not deleted", result.message || undefined);
+        return setMessage(result.message);
+      }
+      notify.done("Invoice deleted", invoiceNumber);
       router.push("/admin/invoices");
       router.refresh();
     });

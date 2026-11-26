@@ -1,4 +1,5 @@
 "use client";
+import { notify } from "@/lib/admin-toast";
 
 import { useState, useTransition } from "react";
 import { changeOrderStatus } from "@/app/actions/updateOrder";
@@ -39,7 +40,10 @@ export function FulfillmentControls({ orderId, status }: { orderId: string; stat
 
     startTransition(() => {
       void changeOrderStatus(orderId, nextStatus).then((result) => {
-        setMessage(result.success ? result.message || "Order updated. Refreshing…" : result.message || "Could not update order.");
+        setMessage(result.success ? "" : result.message || "Could not update order.");
+        const label: Record<string, string> = { processing: "Order is now processing", shipped: "Order marked as shipped", delivered: "Order marked as delivered", cancelled: "Order cancelled" };
+        if (result.success) notify.done(label[nextStatus] || "Order updated", result.message || undefined);
+        else notify.failed("Order not updated", result.message || undefined);
       });
     });
   }

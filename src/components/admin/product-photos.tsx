@@ -1,4 +1,5 @@
 "use client";
+import { notify, reason } from "@/lib/admin-toast";
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -47,11 +48,13 @@ export function ProductPhotos({ productId, productName, images }: { productId: s
   }
 
   function done(text: string) {
-    setMessage({ ok: true, text });
+    setMessage(null);
+    notify.done(text, productName);
     startTransition(() => router.refresh());
   }
   function fail(error: unknown, fallback: string) {
-    setMessage({ ok: false, text: error instanceof Error ? error.message : fallback });
+    setMessage({ ok: false, text: reason(error, fallback) });
+    notify.failed(fallback, reason(error));
   }
 
   async function replace(file: File | undefined) {

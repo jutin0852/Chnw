@@ -1,4 +1,5 @@
 "use client";
+import { notify, reason } from "@/lib/admin-toast";
 
 import { useState, useTransition } from "react";
 import { createCategory, deleteCategory } from "../../app/actions/manageCategories";
@@ -14,15 +15,22 @@ export function CategoryManagement({ categories }: { categories: Category[] }) {
   function addCategory() {
     startTransition(() => {
       void createCategory({ name, description }).then((result) => {
-        if (result.success) { setName(""); setDescription(""); setMessage("Category created."); }
-        else setMessage(result.message || "Could not create category.");
+        if (result.success) { notify.done("Category created", name.trim()); setName(""); setDescription(""); setMessage(""); }
+        else { setMessage(result.message || "Could not create category."); notify.failed("Category not created", result.message || undefined); }
       });
     });
   }
 
   function removeCategory(id: string) {
     if (!window.confirm("Delete this category? Products will become uncategorised.")) return;
-    startTransition(() => { void deleteCategory(id); });
+    startTransition(async () => {
+      try {
+        await deleteCategory(id);
+        notify.done("Category deleted", "Its products are now uncategorised.");
+      } catch (error) {
+        notify.failed("Couldn't delete the category", reason(error));
+      }
+    });
   }
 
   return <div className="space-y-6">

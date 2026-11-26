@@ -1,4 +1,5 @@
 "use client";
+import { notify, reason } from "@/lib/admin-toast";
 
 import Link from "next/link";
 import { useState, useTransition } from "react";
@@ -24,21 +25,45 @@ export function ProductManagement({
   );
 
   function toggle(id: string, field: "isActive" | "featured", value: boolean) {
+    const before = items;
+    const name = items.find((item) => item.id === id)?.productName || "Product";
     setItems((current) =>
       current.map((item) =>
         item.id === id ? { ...item, [field]: value } : item,
       ),
     );
-    startTransition(() => {
-      void updateProductStatus(id, field, value);
+    startTransition(async () => {
+      try {
+        await updateProductStatus(id, field, value);
+        notify.done(
+          field === "isActive" ? (value ? "Product is live" : "Product hidden") : value ? "Marked as featured" : "No longer featured",
+          field === "isActive" ? (value ? `${name} now shows in the shop.` : `${name} is hidden from the shop.`) : name,
+        );
+      } catch (error) {
+        setItems(before);
+        notify.failed("Couldn't update the product", reason(error));
+      }
     });
   }
 
   function remove(id: string) {
     if (!window.confirm("Delete this product and its images?")) return;
+    const before = items;
+    const name = items.find((item) => item.id === id)?.productName || "Product";
     setItems((current) => current.filter((item) => item.id !== id));
-    startTransition(() => {
-      void deleteProduct(id);
+    startTransition(async () => {
+      try {
+        const result = await deleteProduct(id);
+        if (!result.success) {
+          setItems(before);
+          notify.failed("Product not deleted", result.message);
+          return;
+        }
+        notify.done("Product deleted", name);
+      } catch (error) {
+        setItems(before);
+        notify.failed("Couldn't delete the product", reason(error));
+      }
     });
   }
 

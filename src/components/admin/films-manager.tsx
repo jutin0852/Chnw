@@ -1,4 +1,5 @@
 "use client";
+import { notify, reason } from "@/lib/admin-toast";
 
 import { useRef, useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -92,8 +93,10 @@ function FilmCard({
       setProgress(0);
       const videoId = await uploadVideo(file, setProgress);
       await onSave(videoId, alt);
+      notify.done("Film uploaded", `${title} will show on the store within a minute.`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The upload failed.");
+      setError(reason(e, "The upload failed."));
+      notify.failed("Film not uploaded", reason(e, "The upload failed."));
     } finally {
       setProgress(null);
       if (input.current) input.current.value = "";
@@ -134,12 +137,30 @@ function FilmCard({
             {progress !== null ? `Uploading ${progress}%` : slot.videoId ? "Replace film" : "Upload film"}
           </label>
           {slot.uploaded && (
-            <button type="button" disabled={busy} onClick={() => { if (window.confirm(removeLabel)) startTransition(() => void onRemove()); }} className="rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50">
+            <button type="button" disabled={busy} onClick={() => {
+                if (!window.confirm(removeLabel)) return;
+                startTransition(async () => {
+                  try {
+                    await onRemove();
+                    notify.done("Film removed", `${title} is back to its original film.`);
+                  } catch (e) {
+                    notify.failed("Film not removed", reason(e));
+                  }
+                });
+              }} className="rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50">
               Remove
             </button>
           )}
           {slot.videoId && ((slot.uploaded && alt !== slot.alt) || extraDirty) && (
-            <button type="button" disabled={busy} onClick={() => startTransition(() => void onSave(slot.videoId as string, alt).catch((e) => setError(e instanceof Error ? e.message : "Could not save.")))} className="rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50">
+            <button type="button" disabled={busy} onClick={() => startTransition(async () => {
+                try {
+                  await onSave(slot.videoId as string, alt);
+                  notify.done(extraDirty ? "Changes saved" : "Description saved", title);
+                } catch (e) {
+                  setError(reason(e, "Could not save."));
+                  notify.failed("Not saved", reason(e, "Could not save."));
+                }
+              })} className="rounded-md border px-3 py-2 text-sm hover:bg-muted disabled:opacity-50">
               {extraDirty ? "Save changes" : "Save description"}
             </button>
           )}
