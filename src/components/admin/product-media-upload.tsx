@@ -59,13 +59,13 @@ export function ProductMediaUpload({
   }
 
   return (
-    <div className="border border-dashed border-black/25 bg-[var(--brand-canvas)] p-4">
+    <div className="rounded-lg border border-dashed border-black/25 bg-[var(--brand-canvas)] p-4">
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
         multiple
-        className="block w-full text-sm file:mr-3 file:border-0 file:bg-[var(--brand-tint)] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-black"
+        className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-[var(--brand-tint)] file:px-3 file:py-2 file:text-xs file:font-semibold file:text-black"
       />
       <p className="mt-3 text-xs leading-5 text-muted-foreground">
         Add up to {5 - currentImageCount} more image{5 - currentImageCount === 1 ? "" : "s"}. Images are automatically resized and compressed before storage.

@@ -10,15 +10,14 @@ import ReelVideo from "../components/store/reel-video";
 import ProductCard from "../components/store/product-card";
 import { cloudinaryThumb, pieceNumbers, shortName } from "../components/store/catalog";
 import { formatStorePrice } from "../components/store/currency";
-import { fabricFilm, lookFilms } from "@/config/films";
-import { getHeroFilms } from "@/lib/films-queries";
+import { getHeroFilms, getProductFilms, getReelFilms } from "@/lib/films-queries";
 
 export const dynamic = "force-dynamic";
 
 const NEW_IN = ["the-triangle-tote", "the-crochet-denim-skirt", "the-gigi-pants-polka-dot", "the-soni-dress", "the-asymmetric-denim-skirt"];
 
 export default async function Home() {
-  const [everything, heroFilms] = await Promise.all([getAllProducts(), getHeroFilms()]);
+  const [everything, heroFilms, productFilms, reelFilms] = await Promise.all([getAllProducts(), getHeroFilms(), getProductFilms(), getReelFilms()]);
   const numbers = pieceNumbers(everything);
   const bySlug = new Map(everything.map((p) => [p.slug, p]));
   const products = collapseColourways(everything);
@@ -27,6 +26,7 @@ export default async function Home() {
   const newIn = picked.length >= 5 ? picked : [...picked, ...products.filter((p) => !picked.includes(p))].slice(0, 5);
 
   const crochet = bySlug.get("the-crochet-denim-skirt");
+  const fabricFilm = productFilms["the-crochet-denim-skirt"];
   const loaderPhotos = products.flatMap((p) => p.images.slice(0, 1).map((i) => cloudinaryThumb(i.imageUrl, 260)));
 
   return (
@@ -54,7 +54,7 @@ export default async function Home() {
               className="absolute inset-x-4 bottom-6 flex flex-col gap-5 sm:inset-x-6 lg:inset-x-10 lg:bottom-9 lg:flex-row lg:items-end lg:justify-between"
             >
               <p className="max-w-[340px] text-[15px] leading-[1.55] text-white/90 lg:order-2 lg:mr-40">
-                Reworked denim and faux leather, cut and finished by hand after you order. Made once, made to last.
+                Denim pieces and faux leather, cut and finished by hand after you order. Made once, made to last.
               </p>
               <div className="flex items-baseline justify-between gap-5 border-t border-white/30 pt-4 lg:border-0 lg:pt-0">
                 <span className="font-display text-[38px] leading-none sm:text-[52px]">New in</span>
@@ -76,6 +76,10 @@ export default async function Home() {
                     product={product}
                     number={numbers.get(product.id)}
                     large={i === 0}
+                    // On wide screens the lead card fills the height of the 2x2 block beside it, so
+                    // its photo and caption line up with the bottom row instead of running past it.
+                    aspect={i === 0 ? "aspect-[4/5] lg:aspect-auto lg:min-h-0 lg:flex-1" : undefined}
+                    className={i === 0 ? "lg:h-full" : ""}
                     priority={i === 0}
                     highPriority={i === 0}
                     sizes={i === 0 ? "(max-width: 1023px) 100vw, 50vw" : "(max-width: 1023px) 50vw, 25vw"}
@@ -124,16 +128,16 @@ export default async function Home() {
               <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noopener noreferrer" className="label draw py-1 text-[13px]">@chnw.ng on Instagram</a>
             </div>
             <ul className="mx-auto flex max-w-[1500px] snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:px-8 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-12 [&::-webkit-scrollbar]:hidden">
-              {lookFilms.map((film, i) => {
+              {reelFilms.map((film, i) => {
                 const product = bySlug.get(film.slug);
                 return (
-                  <li key={film.code} className="w-[68vw] shrink-0 snap-start sm:w-[40vw] lg:w-auto" data-reveal="up" data-delay={String(i * 0.06)}>
+                  <li key={`${i}-${film.code}`} className="w-[68vw] shrink-0 snap-start sm:w-[40vw] lg:w-auto" data-reveal="up" data-delay={String(i * 0.06)}>
                     <Link href={product ? `/product/${film.slug}` : "/shop"} className="card group relative block aspect-[9/16] overflow-hidden bg-ink text-white">
                       <ReelVideo code={film.code} label={film.alt} className="transition-transform duration-[1.2s] ease-cloth group-hover:scale-[1.03]" />
                       <span className="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-[linear-gradient(180deg,rgba(20,18,16,0)_0%,rgba(20,18,16,0.78)_100%)] p-4 pt-16">
                         <span className="label text-[11px] text-white/75">Shop the look</span>
                         <span className="flex items-baseline justify-between gap-2">
-                          <span className="font-display text-[22px] leading-tight">{shortName(film.label)}</span>
+                          <span className="font-display text-[22px] leading-tight">{shortName(product?.productName || film.label)}</span>
                           {product && <span className="label text-[12px] tracking-[0.04em]">{formatStorePrice(product.price)}</span>}
                         </span>
                       </span>

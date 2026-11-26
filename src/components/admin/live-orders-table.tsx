@@ -15,7 +15,7 @@ import { formatStorePrice } from "../store/currency";
 
 export function LiveOrdersTable({ orders }: { orders: AdminOrder[] }) {
   return (
-    <div className="overflow-x-auto border border-black/15 bg-white">
+    <div className="overflow-x-auto rounded-lg border border-black/15 bg-white">
       <Table>
         <TableHeader className="bg-[var(--brand-tint)]">
           <TableRow>

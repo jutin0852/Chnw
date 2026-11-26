@@ -49,7 +49,7 @@ export function ProductManagement({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search products or SKU"
-          className="h-10 w-full max-w-sm border border-black/25 bg-white px-3 text-sm outline-none focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
+          className="h-10 w-full max-w-sm rounded-md border border-black/25 bg-white px-3 text-sm outline-none focus:border-[var(--brand)] focus:ring-1 focus:ring-[var(--brand)]"
         />
         <Link
           href="/admin/add-product"
@@ -58,7 +58,7 @@ export function ProductManagement({
           Add product
         </Link>
       </div>
-      <div className="overflow-x-auto border border-black/15 bg-white">
+      <div className="overflow-x-auto rounded-lg border border-black/15 bg-white">
         <table className="min-w-[760px] w-full text-sm">
           <thead className="bg-[var(--brand-tint)] text-left text-[10px] uppercase tracking-[.12em]">
             <tr>
@@ -86,7 +86,7 @@ export function ProductManagement({
                 <tr key={product.id} className="border-t">
                   <td className="p-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-10 overflow-hidden rounded bg-muted">
+                      <div className="h-12 w-10 overflow-hidden rounded-md bg-muted">
                         {product.images[0] && (
                           <img
                             src={product.images[0].imageUrl}

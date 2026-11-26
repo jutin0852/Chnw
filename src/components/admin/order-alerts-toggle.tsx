@@ -112,7 +112,7 @@ export function OrderAlertsToggle() {
         <Icon className="h-[18px] w-[18px]" aria-hidden />
       </button>
       {open && (
-        <div role="dialog" aria-label="Order alerts" className="absolute right-0 top-11 z-50 w-[min(300px,calc(100vw-2rem))] border border-black/15 bg-white p-4 text-sm shadow-lg">
+        <div role="dialog" aria-label="Order alerts" className="absolute right-0 top-11 z-50 w-[min(300px,calc(100vw-2rem))] rounded-lg border border-black/15 bg-white p-4 text-sm shadow-lg">
           <p className="text-[10px] font-semibold uppercase tracking-[.14em] text-[var(--brand)]">Order alerts</p>
           {state === "on" && <p className="mt-2 leading-5 text-black/70">This device gets a notification when a customer pays for an order.</p>}
           {state === "off" && <p className="mt-2 leading-5 text-black/70">Get a notification on this device when a customer pays for an order.</p>}
@@ -123,7 +123,7 @@ export function OrderAlertsToggle() {
           <div className="mt-3 flex flex-wrap gap-2">
             {state === "off" && <button type="button" disabled={busy} onClick={turnOn} className="bg-[var(--brand)] px-3 py-2 text-xs font-semibold uppercase tracking-[.08em] text-white disabled:opacity-60">{busy ? "Turning on..." : "Turn on alerts"}</button>}
             {state === "on" && <button type="button" disabled={busy} onClick={test} className="bg-[var(--brand)] px-3 py-2 text-xs font-semibold uppercase tracking-[.08em] text-white disabled:opacity-60">Send a test</button>}
-            {state === "on" && <button type="button" disabled={busy} onClick={turnOff} className="border border-black/20 px-3 py-2 text-xs font-semibold uppercase tracking-[.08em] disabled:opacity-60">Turn off</button>}
+            {state === "on" && <button type="button" disabled={busy} onClick={turnOff} className="rounded-md border border-black/20 px-3 py-2 text-xs font-semibold uppercase tracking-[.08em] disabled:opacity-60">Turn off</button>}
           </div>
           {message && <p role="status" className="mt-3 text-xs text-black/60">{message}</p>}
         </div>

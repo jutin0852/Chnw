@@ -99,7 +99,7 @@ export function ChartAreaInteractive({ data = [] }: { data?: DayPoint[] }) {
   const maxOrders = Math.max(1, ...series.map((point) => point.orders));
 
   return (
-    <Card className="@container/card rounded-none border-black/15 bg-white shadow-none">
+    <Card className="@container/card rounded-lg border-black/15 bg-white shadow-none">
       <CardHeader>
         <CardTitle>Store performance</CardTitle>
         <CardDescription>
