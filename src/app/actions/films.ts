@@ -2,7 +2,8 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { siteFilms } from "@/lib/schema";
+import { products, siteFilms } from "@/lib/schema";
+import { FEATURED_FILM_SLUGS } from "@/config/films";
 import { requireAdmin } from "@/lib/admin-auth";
 
 // Only Cloudinary public ids from our own folders are accepted.
@@ -32,8 +33,15 @@ export async function removeHeroFilm(position: number) {
   refresh();
 }
 
+/** Product films are only kept for the featured products (Crochet Denim Skirt, Gigi Pants). */
+async function requireFeaturedProduct(productId: string) {
+  const [row] = await db.select({ slug: products.slug }).from(products).where(eq(products.id, productId)).limit(1);
+  if (!row || !FEATURED_FILM_SLUGS.includes(row.slug)) throw new Error("Films can only be set for the featured products.");
+}
+
 export async function setProductFilm(productId: string, videoId: string, alt: string) {
   await requireAdmin();
+  await requireFeaturedProduct(productId);
   if (!VIDEO_ID.test(videoId)) throw new Error("That video could not be used.");
   const altText = alt.trim().slice(0, 200) || null;
   await db.delete(siteFilms).where(and(eq(siteFilms.placement, "product"), eq(siteFilms.productId, productId)));

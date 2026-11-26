@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { products, siteFilms } from "@/lib/schema";
-import { heroFilms as defaultHero, productFilm as defaultProduct, type Film } from "@/config/films";
+import { featuredFilms, heroFilms as defaultHero, type Film } from "@/config/films";
 
 // Films managed in /admin/films. Falls back to the built-in films when the table is missing or
 // empty, so the storefront never shows a hole. Cached briefly; saving in the admin revalidates it.
@@ -33,8 +33,16 @@ export async function getHeroFilms(): Promise<Film[]> {
   });
 }
 
+/**
+ * Films for the featured products only (Crochet Denim Skirt, Gigi Pants), keyed by product slug.
+ * Each falls back to its built-in film on its own, so uploading one never hides the other.
+ */
 export async function getProductFilms(): Promise<Record<string, Film>> {
   const rows = (await load()).filter((r) => r.placement === "product" && r.slug);
-  if (!rows.length) return defaultProduct;
-  return Object.fromEntries(rows.map((r) => [r.slug as string, { code: r.videoId, alt: r.alt || `${r.name} in motion` }]));
+  return Object.fromEntries(
+    featuredFilms.map(({ slug, film }) => {
+      const row = rows.find((r) => r.slug === slug);
+      return [slug, row ? { code: row.videoId, alt: row.alt || film.alt } : film];
+    }),
+  );
 }

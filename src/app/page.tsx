@@ -8,17 +8,16 @@ import HomeLoader from "../components/store/home-loader";
 import HeroFilms from "../components/store/hero-films";
 import ReelVideo from "../components/store/reel-video";
 import ProductCard from "../components/store/product-card";
-import { cloudinaryThumb, pieceNumbers, shortName } from "../components/store/catalog";
+import { cloudinaryThumb, pieceNumbers } from "../components/store/catalog";
 import { formatStorePrice } from "../components/store/currency";
-import { fabricFilm, lookFilms } from "@/config/films";
-import { getHeroFilms } from "@/lib/films-queries";
+import { getHeroFilms, getProductFilms } from "@/lib/films-queries";
 
 export const dynamic = "force-dynamic";
 
 const NEW_IN = ["the-triangle-tote", "the-crochet-denim-skirt", "the-gigi-pants-polka-dot", "the-soni-dress", "the-asymmetric-denim-skirt"];
 
 export default async function Home() {
-  const [everything, heroFilms] = await Promise.all([getAllProducts(), getHeroFilms()]);
+  const [everything, heroFilms, productFilms] = await Promise.all([getAllProducts(), getHeroFilms(), getProductFilms()]);
   const numbers = pieceNumbers(everything);
   const bySlug = new Map(everything.map((p) => [p.slug, p]));
   const products = collapseColourways(everything);
@@ -27,6 +26,7 @@ export default async function Home() {
   const newIn = picked.length >= 5 ? picked : [...picked, ...products.filter((p) => !picked.includes(p))].slice(0, 5);
 
   const crochet = bySlug.get("the-crochet-denim-skirt");
+  const fabricFilm = productFilms["the-crochet-denim-skirt"];
   const loaderPhotos = products.flatMap((p) => p.images.slice(0, 1).map((i) => cloudinaryThumb(i.imageUrl, 260)));
 
   return (
@@ -115,33 +115,6 @@ export default async function Home() {
                 )}
               </div>
             </div>
-          </section>
-
-          {/* ── Reels: worn by you ─────────────────────────── */}
-          <section aria-labelledby="reels-title" className="py-20 lg:py-28">
-            <div className="mx-auto mb-8 flex max-w-[1500px] flex-wrap items-baseline justify-between gap-4 px-4 sm:px-8 lg:px-12">
-              <h2 id="reels-title" data-split="lines" className="font-display text-[40px] leading-none sm:text-[56px]">Worn by you, filmed by us</h2>
-              <a href="https://www.instagram.com/chnw.ng/" target="_blank" rel="noopener noreferrer" className="label draw py-1 text-[13px]">@chnw.ng on Instagram</a>
-            </div>
-            <ul className="mx-auto flex max-w-[1500px] snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:px-8 lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-12 [&::-webkit-scrollbar]:hidden">
-              {lookFilms.map((film, i) => {
-                const product = bySlug.get(film.slug);
-                return (
-                  <li key={film.code} className="w-[68vw] shrink-0 snap-start sm:w-[40vw] lg:w-auto" data-reveal="up" data-delay={String(i * 0.06)}>
-                    <Link href={product ? `/product/${film.slug}` : "/shop"} className="card group relative block aspect-[9/16] overflow-hidden bg-ink text-white">
-                      <ReelVideo code={film.code} label={film.alt} className="transition-transform duration-[1.2s] ease-cloth group-hover:scale-[1.03]" />
-                      <span className="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-[linear-gradient(180deg,rgba(20,18,16,0)_0%,rgba(20,18,16,0.78)_100%)] p-4 pt-16">
-                        <span className="label text-[11px] text-white/75">Shop the look</span>
-                        <span className="flex items-baseline justify-between gap-2">
-                          <span className="font-display text-[22px] leading-tight">{shortName(film.label)}</span>
-                          {product && <span className="label text-[12px] tracking-[0.04em]">{formatStorePrice(product.price)}</span>}
-                        </span>
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
           </section>
 
           {/* ── The Workroom ───────────────────────────────── */}
